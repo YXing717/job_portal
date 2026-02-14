@@ -12,5 +12,8 @@ public class Job_portal {
 
     public static void main(String[] args) {
         System.out.println("This is a test file.");
+        
+        System.out.println("Test github connection to JIRA!!! using JP-7");
+        
     }
 }
