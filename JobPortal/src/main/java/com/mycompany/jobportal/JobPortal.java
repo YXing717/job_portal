@@ -11,6 +11,6 @@ package com.mycompany.jobportal;
 public class JobPortal {
 
     public static void main(String[] args) {
-        System.out.println("Test commit again using JP-7: Update for Jira sync test");
+        System.out.println("Test commit againasdfghjkl.fghjkl; using JP-7: Update for Jira sync test");
     }
 }
