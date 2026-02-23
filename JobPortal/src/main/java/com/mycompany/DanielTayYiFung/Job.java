@@ -1,3 +1,5 @@
+package com.mycompany.DanielTayYiFung;
+
 public class Job {
   private int jobId;
   private String jobTitle;
