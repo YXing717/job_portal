@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Job Portal - Demo</title>
+  <link rel="stylesheet" href="jobportal.css">
+</head>
+<body>
+  <main class="container">
+    <header class="hero">
+      <h1>Job Portal</h1>
+      <p class="subtitle">Search jobs instantly — try typing <em>engi</em> for suggestions</p>
+    </header>
+
+    <section class="search-panel">
+      <div class="search-row">
+        <div class="input-wrap">
+          <input id="searchInput" type="search" placeholder="Search jobs, e.g. software engineer" autocomplete="off" />
+          <ul id="suggestions" class="suggestions" aria-hidden="true"></ul>
+        </div>
+        <div class="controls">
+          <select id="modeSelect">
+            <option value="partial">Partial</option>
+            <option value="exact">Exact</option>
+            <option value="multi">Multi-keyword (AND)</option>
+          </select>
+          <button id="searchBtn" class="btn">Search</button>
+        </div>
+      </div>
+      <div class="pager-controls">
+        <label>Page size: <input id="pageSize" type="number" min="1" value="5" /></label>
+      </div>
+    </section>
+
+    <section id="results" class="results">
+      <!-- results render here -->
+    </section>
+
+    <nav id="pagination" class="pagination" aria-label="Pagination">
+      <!-- pagination buttons -->
+    </nav>
+
+    <footer class="foot">This is a local demo. Data is loaded in the browser.</footer>
+  </main>
+
+  <script src="jobportal.js"></script>
+</body>
+</html>
