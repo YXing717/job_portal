@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Profile</title>
+    <link rel="stylesheet" href="JobSeekProfileEdit.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Edit Profile</h1>
+        <section class="skills">
+            <h2>Skills</h2>
+            <input type="text" id="skill-input" placeholder="Add skill">
+            <button onclick="addSkill()">Add</button>
+            <ul id="skills-list"></ul>
+        </section>
+        <section class="experience">
+            <h2>Work Experience</h2>
+            <input type="text" id="title" placeholder="Title">
+            <input type="text" id="company" placeholder="Company">
+            <input type="text" id="start" placeholder="Start (YYYY-MM)">
+            <input type="text" id="end" placeholder="End (YYYY-MM or Present)">
+            <textarea id="desc" placeholder="Description"></textarea>
+            <button onclick="addExperience()">Add</button>
+            <ul id="exp-list"></ul>
+        </section>
+        <button onclick="saveProfile()">Save Changes</button>
+        <div id="message"></div>
+    </div>
+    <script src="JobSeekProfileEdit.js"></script>
+</body>
+</html>
