@@ -1,17 +1,20 @@
-// Sample jobs (same data as console sample)
+// Sample jobs located in Malaysia with RM salaries between 1.8k and 9k
 const JOBS = [
-  {title:"Software Engineer", location:"New York", salary:120000},
-  {title:"Senior Software Engineer", location:"San Francisco", salary:160000},
-  {title:"Engineering Manager", location:"Austin", salary:150000},
-  {title:"Mechanical Engineer", location:"Detroit", salary:90000},
-  {title:"Civil Engineer", location:"Denver", salary:95000},
-  {title:"QA Engineer", location:"Remote", salary:85000},
-  {title:"Software Developer", location:"Remote", salary:110000},
-  {title:"Data Scientist", location:"Boston", salary:130000},
-  {title:"Research Engineer", location:"Palo Alto", salary:140000},
-  {title:"Electrical Engineer", location:"Chicago", salary:100000},
-  {title:"English Teacher", location:"Seoul", salary:40000},
-  {title:"Engineering Technician", location:"Columbus", salary:70000}
+  {title:"Software Engineer", location:"Kuala Lumpur", salary:9000},
+  {title:"Senior Software Engineer", location:"Penang", salary:8500},
+  {title:"Engineering Manager", location:"Johor Bahru", salary:8000},
+  {title:"Mechanical Engineer", location:"Kuala Lumpur", salary:7500},
+  {title:"Civil Engineer", location:"Kuantan", salary:7000},
+  {title:"QA Engineer", location:"Ipoh", salary:6800},
+  {title:"Software Developer", location:"Malacca", salary:6200},
+  {title:"Data Scientist", location:"Cyberjaya", salary:7800},
+  {title:"Research Engineer", location:"Putrajaya", salary:8200},
+  {title:"Electrical Engineer", location:"George Town", salary:7300},
+  {title:"English Teacher", location:"Kota Kinabalu", salary:1800},
+  {title:"Engineering Technician", location:"Kuching", salary:2400},
+  {title:"Frontend Developer", location:"Shah Alam", salary:5600},
+  {title:"Product Manager", location:"Petaling Jaya", salary:8800},
+  {title:"UX Designer", location:"Seremban", salary:4900}
 ];
 
 function normalize(s){
@@ -28,10 +31,24 @@ function searchJobs(query, mode){
   if(mode === 'exact') return JOBS.filter(j => normalize(j.title) === q);
   if(mode === 'partial') return JOBS.filter(j => normalize(j.title).includes(q));
   if(mode === 'multi'){
-    const parts = q ? q.split(' ') : [];
+    // keywords separated by comma; numeric token treated as salary minimum
+    const rawParts = query.split(',').map(s => s.trim()).filter(s => s !== '');
+    let minSalary = 0;
+    const tokens = [];
+    for(const part of rawParts){
+      // if numeric value, treat as salary floor
+      const num = parseFloat(part.replace(/[^0-9.]/g, ''));
+      if(!isNaN(num) && num.toString() === part){
+        minSalary = Math.max(minSalary, num);
+      } else {
+        tokens.push(normalize(part));
+      }
+    }
     return JOBS.filter(j => {
-      const t = normalize(j.title);
-      return parts.length === 0 ? false : parts.every(p => t.includes(p));
+      if(j.salary < minSalary) return false;
+      const title = normalize(j.title);
+      const loc = normalize(j.location);
+      return tokens.every(tok => title.includes(tok) || loc.includes(tok));
     });
   }
   return [];
@@ -61,13 +78,20 @@ const searchBtn = document.getElementById('searchBtn');
 const modeSelect = document.getElementById('modeSelect');
 const resultsEl = document.getElementById('results');
 const paginationEl = document.getElementById('pagination');
+// page size input is no longer shown in the UI; keep a default value in case the element is removed
 const pageSizeInput = document.getElementById('pageSize');
+const DEFAULT_PAGE_SIZE = 5;
 
 let currentResults = [];
 let currentPage = 1;
 
+function getPageSize(){
+  if(pageSizeInput) return Math.max(1, parseInt(pageSizeInput.value)||DEFAULT_PAGE_SIZE);
+  return DEFAULT_PAGE_SIZE;
+}
+
 function renderResults(page=1){
-  const pageSize = Math.max(1, parseInt(pageSizeInput.value)||5);
+  const pageSize = getPageSize();
   currentPage = page;
   const total = currentResults.length;
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
@@ -83,7 +107,7 @@ function renderResults(page=1){
     const card = document.createElement('div'); card.className='job-card';
     const left = document.createElement('div'); left.className='job-left';
     const title = document.createElement('div'); title.className='job-title'; title.textContent = j.title;
-    const meta = document.createElement('div'); meta.className='job-meta'; meta.textContent = `${j.location} • $${j.salary.toLocaleString()}`;
+    const meta = document.createElement('div'); meta.className='job-meta'; meta.textContent = `${j.location} • RM${j.salary.toLocaleString()}`;
     left.appendChild(title); left.appendChild(meta);
     const right = document.createElement('div'); right.className='job-right'; right.textContent = '';
     card.appendChild(left); card.appendChild(right);
@@ -129,6 +153,22 @@ input.addEventListener('input', e => {
   }, 160);
 });
 
+// hide suggestions when clicking anywhere outside the input or the list
+document.addEventListener('click', e => {
+  if(!input.contains(e.target) && !suggestionsEl.contains(e.target)){
+    suggestionsEl.style.display = 'none';
+  }
+});
+
+// tooltip for search mode information
+const infoBtn = document.getElementById('infoBtn');
+const infoTooltip = document.getElementById('infoTooltip');
+if(infoBtn && infoTooltip){
+  infoBtn.addEventListener('mouseover', () => { infoTooltip.style.display = 'block'; });
+  infoBtn.addEventListener('mouseout', () => { infoTooltip.style.display = 'none'; });
+}
+
+
 searchBtn.addEventListener('click', ()=>{
   const q = input.value.trim();
   const mode = modeSelect.value;
@@ -136,7 +176,9 @@ searchBtn.addEventListener('click', ()=>{
   renderResults(1);
 });
 
-pageSizeInput.addEventListener('change', ()=> renderResults(1));
+if(pageSizeInput){
+  pageSizeInput.addEventListener('change', ()=> renderResults(1));
+}
 
 // initial empty state
 currentResults = [];

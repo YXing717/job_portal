@@ -10,7 +10,6 @@
   <main class="container">
     <header class="hero">
       <h1>Job Portal</h1>
-      <p class="subtitle">Search jobs instantly — try typing <em>engi</em> for suggestions</p>
     </header>
 
     <section class="search-panel">
@@ -26,11 +25,22 @@
             <option value="multi">Multi-keyword (AND)</option>
           </select>
           <button id="searchBtn" class="btn">Search</button>
+          <button id="infoBtn" class="btn info" aria-describedby="infoTooltip">i</button>
+        </div>
+        <div id="infoTooltip" class="tooltip" role="tooltip">
+          <p><strong>Search modes with examples:</strong></p>
+          <ul>
+            <li><strong>Partial</strong><br>query <code>engineer</code> finds “Software Engineer”, “QA Engineer”, etc.</li>
+            <li><strong>Exact</strong><br>query <code>Software Engineer</code> matches only that full title.</li>
+            <li><strong>Multi-keyword</strong><br>separate terms with commas and mix title/location keywords with a salary floor. Example:
+              <ul>
+                <li><code>software,kl,3000</code> finds jobs whose title or location contains “software” AND “kl” (Kuala Lumpur) with salary ≥ 3000</li>
+              </ul>
+            </li>
+          </ul>
         </div>
       </div>
-      <div class="pager-controls">
-        <label>Page size: <input id="pageSize" type="number" min="1" value="5" /></label>
-      </div>
+
     </section>
 
     <section id="results" class="results">
