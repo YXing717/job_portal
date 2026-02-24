@@ -59,15 +59,15 @@ function renderJobs() {
     const div = document.createElement('div');
     div.className = 'job-card';
 
-    div.innerHTML = `
-      <div>
-        <b>${job.title}</b><br>
-        ${job.location} • RM${job.salary}
-      </div>
-      <button ${alreadyApplied ? "disabled" : ""}>
-        ${alreadyApplied ? "Applied" : "Apply Now"}
-      </button>
-    `;
+   div.innerHTML = `
+  <div>
+    <b>${job.title}</b><br>
+    ${job.location} &bull; RM${job.salary}
+  </div>
+  <button ${alreadyApplied ? "disabled" : ""}>
+    ${alreadyApplied ? "Applied" : "Apply Now"}
+  </button>
+`;
 
     const btn = div.querySelector("button");
     btn.onclick = () => applyJob(job);
