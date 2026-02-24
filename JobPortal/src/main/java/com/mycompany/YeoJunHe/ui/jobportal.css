@@ -38,8 +38,8 @@ select{padding:10px;border-radius:8px;background:#07122a;border:1px solid rgba(2
 .job-meta{color:var(--muted);font-size:14px;margin-top:6px}
 
 /* no-results styling */
-.no-results{flex-direction:column;text-align:center;background:rgba(124,58,237,0.1);}
-.no-results-emoji{font-size:48px;margin-bottom:8px}
+.no-results{flex-direction:column;text-align:center;background:rgba(124,58,237,0.1);z-index:-1;}
+.no-results-emoji{font-size:48px;margin-bottom:8px;}
 .no-results-text{color:var(--muted);font-size:16px;line-height:1.4}
 
 .pagination{display:flex;gap:8px;align-items:center;justify-content:center;margin-top:12px}
