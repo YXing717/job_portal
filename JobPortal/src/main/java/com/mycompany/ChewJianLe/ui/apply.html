@@ -9,9 +9,20 @@
 <body>
 
   <h1>Job Portal Demo</h1>
-  <p>Click "Apply Now" to test the application functionality.</p>
+  <p>Enter your profile below and click "Save Profile", then click "Apply Now" on any job.</p>
+
+  <!-- Temporary Profile Input -->
+  <div id="profileForm">
+    <h2>Enter Your Profile</h2>
+    <input type="text" id="name" placeholder="Name"><br><br>
+    <input type="email" id="email" placeholder="Email"><br><br>
+    <input type="text" id="skills" placeholder="Skills (comma separated)"><br><br>
+    <input type="number" id="experience" placeholder="Years of experience"><br><br>
+    <button onclick="saveProfile()">Save Profile</button>
+  </div>
 
   <!-- Job Listings -->
+  <h2>Available Jobs</h2>
   <div id="results"></div>
 
   <!-- Message display -->

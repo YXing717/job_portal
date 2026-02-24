@@ -1,30 +1,50 @@
-// --- Mock Data ---
-let data = {
-  "userProfile": {
-    "name": "Chew Jian Le",
-    "email": "jianle@example.com",
-    "skills": ["Java", "React", "SQL"],
-    "experience": 3
-  },
-  "applications": [],
-  "jobs": [
-    {"id":1,"title":"Software Engineer","location":"Kuala Lumpur","salary":9000},
-    {"id":2,"title":"QA Engineer","location":"Ipoh","salary":6800},
-    {"id":3,"title":"Data Scientist","location":"Cyberjaya","salary":7800},
-    {"id":4,"title":"UX Designer","location":"Kuala Lumpur","salary":5500},
-    {"id":5,"title":"Frontend Developer","location":"Shah Alam","salary":5600}
-  ]
+// ------------------------
+// Temporary profile and applications
+// ------------------------
+let tempProfile = {
+  name: '',
+  email: '',
+  skills: [],
+  experience: 0
 };
 
-// --- Variables ---
-let userProfile = data.userProfile;
-let applications = data.applications;
-let jobs = data.jobs;
+let applications = [];
 
-// --- Render jobs immediately ---
-renderResults(jobs);
+// ------------------------
+// Mock job data
+// ------------------------
+const jobs = [
+  {"id":1,"title":"Software Engineer","location":"Kuala Lumpur","salary":9000},
+  {"id":2,"title":"QA Engineer","location":"Ipoh","salary":6800},
+  {"id":3,"title":"Data Scientist","location":"Cyberjaya","salary":7800},
+  {"id":4,"title":"UX Designer","location":"Kuala Lumpur","salary":5500},
+  {"id":5,"title":"Frontend Developer","location":"Shah Alam","salary":5600}
+];
 
-// --- Show messages ---
+// ------------------------
+// Save temporary profile
+// ------------------------
+function saveProfile() {
+  const name = document.getElementById('name').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const skills = document.getElementById('skills').value
+                   .split(',')
+                   .map(s => s.trim())
+                   .filter(s => s);
+  const experience = parseInt(document.getElementById('experience').value);
+
+  tempProfile.name = name;
+  tempProfile.email = email;
+  tempProfile.skills = skills;
+  tempProfile.experience = experience;
+
+  showMessage('Profile saved successfully!', 'success');
+  console.log('Temporary profile:', tempProfile);
+}
+
+// ------------------------
+// Show messages
+// ------------------------
 function showMessage(msg, type='success') {
   const messageEl = document.getElementById('message');
   messageEl.textContent = msg;
@@ -33,7 +53,9 @@ function showMessage(msg, type='success') {
   setTimeout(() => messageEl.style.display='none', 3000);
 }
 
-// --- Render job cards ---
+// ------------------------
+// Render jobs
+// ------------------------
 function renderResults(jobs) {
   const resultsEl = document.getElementById('results');
   resultsEl.innerHTML = '';
@@ -53,27 +75,44 @@ function renderResults(jobs) {
   });
 }
 
-// --- Apply Now logic ---
+// ------------------------
+// Apply Now logic
+// ------------------------
 function applyJob(job, btn) {
-  if(!userProfile.name || !userProfile.email || !userProfile.skills.length || !userProfile.experience){
+  const profile = tempProfile;
+
+  // Scenario 2: Incomplete profile
+  if(!profile.name || !profile.email || !profile.skills.length || !profile.experience){
     showMessage('Please complete your profile before applying.', 'error');
     return;
   }
 
-  if(applications.some(a => a.jobId === job.id && a.email === userProfile.email)){
+  // Scenario 3: Duplicate application
+  if(applications.some(a => a.jobId === job.id && a.email === profile.email)){
     showMessage('You have already applied for this job.', 'error');
     return;
   }
 
-  const app = { jobId: job.id, title: job.title, email: userProfile.email, status: 'Submitted' };
+  // Scenario 4 & 8: Save application
+  const app = { jobId: job.id, title: job.title, email: profile.email, status: 'Submitted' };
   applications.push(app);
   showMessage('Application submitted successfully!', 'success');
 
+  // Update dashboard
   const dashboard = document.getElementById('appliedJobs');
   const li = document.createElement('li');
   li.innerHTML = `${job.title} <span class="status">${app.status}</span>`;
   dashboard.appendChild(li);
 
+  // Update button
   btn.textContent = 'Applied';
   btn.disabled = true;
+
+  // Scenario 5: Employer view simulated in console
+  console.log(`Applicant for "${job.title}":`, profile.name);
 }
+
+// ------------------------
+// Render jobs on page load
+// ------------------------
+renderResults(jobs);
