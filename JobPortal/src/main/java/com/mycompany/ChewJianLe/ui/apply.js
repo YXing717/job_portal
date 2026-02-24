@@ -1,28 +1,19 @@
-[
-  {"id":1,"title":"Software Engineer","location":"Kuala Lumpur","salary":9000},
-  {"id":2,"title":"QA Engineer","location":"Ipoh","salary":6800},
-  {"id":3,"title":"Data Scientist","location":"Cyberjaya","salary":7800},
-  {"id":4,"title":"UX Designer","location":"Kuala Lumpur","salary":5500},
-  {"id":5,"title":"Frontend Developer","location":"Shah Alam","salary":5600}
-]
-// Mock stored profile (you can toggle 'complete' to false to test)
-let userProfile = {
-  name: "Chew Jian Le",
-  email: "jianle@example.com",
-  skills: ["Java", "React", "SQL"],
-  experience: 3 // years
-  // To test incomplete profile, comment out any field
-};
-
-// Applications storage
+let userProfile = {};
 let applications = [];
+let jobs = [];
 
-// Fetch jobs dynamically from JSON
-fetch('jobs.json')
+// Fetch the single JSON file
+fetch('data.json')
   .then(res => res.json())
-  .then(jobs => renderResults(jobs));
+  .then(data => {
+    userProfile = data.userProfile;
+    applications = data.applications;
+    jobs = data.jobs;
+    renderResults(jobs);
+  })
+  .catch(err => console.error('Error loading data:', err));
 
-// Display message
+// Show messages
 function showMessage(msg, type='success') {
   const messageEl = document.getElementById('message');
   messageEl.textContent = msg;
@@ -53,30 +44,25 @@ function renderResults(jobs) {
 
 // Apply Now logic
 function applyJob(job, btn) {
-  // 1️⃣ Check profile completeness
   if(!userProfile.name || !userProfile.email || !userProfile.skills.length || !userProfile.experience){
     showMessage('Please complete your profile before applying.', 'error');
     return;
   }
 
-  // 2️⃣ Check duplicate
   if(applications.some(a => a.jobId === job.id && a.email === userProfile.email)){
     showMessage('You have already applied for this job.', 'error');
     return;
   }
 
-  // 3️⃣ Submit application
   const app = { jobId: job.id, title: job.title, email: userProfile.email, status: 'Submitted' };
   applications.push(app);
   showMessage('Application submitted successfully!', 'success');
 
-  // 4️⃣ Update dashboard
   const dashboard = document.getElementById('appliedJobs');
   const li = document.createElement('li');
-  li.textContent = `${job.title} - ${app.status}`;
+  li.innerHTML = `${job.title} <span class="status">${app.status}</span>`;
   dashboard.appendChild(li);
 
-  // Disable button
   btn.textContent = 'Applied';
   btn.disabled = true;
 }

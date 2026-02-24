@@ -28,3 +28,6 @@
   font-weight: bold;
   color: #007bff;
 }
+
+.success { color: green; }
+.error { color: red; }
