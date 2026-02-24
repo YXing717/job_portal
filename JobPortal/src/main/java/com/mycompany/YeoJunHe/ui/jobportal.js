@@ -1,5 +1,5 @@
-// Sample jobs located in Malaysia with RM salaries between 1.8k and 9k
 const JOBS = [
+  // original seed jobs
   {title:"Software Engineer", location:"Kuala Lumpur", salary:9000},
   {title:"Senior Software Engineer", location:"Penang", salary:8500},
   {title:"Engineering Manager", location:"Johor Bahru", salary:8000},
@@ -14,7 +14,50 @@ const JOBS = [
   {title:"Engineering Technician", location:"Kuching", salary:2400},
   {title:"Frontend Developer", location:"Shah Alam", salary:5600},
   {title:"Product Manager", location:"Petaling Jaya", salary:8800},
-  {title:"UX Designer", location:"Seremban", salary:4900}
+  {title:"UX Designer", location:"Seremban", salary:4900},
+  {title:"DevOps Engineer", location:"Kuala Lumpur", salary:8800},
+  {title:"Backend Engineer", location:"Kuala Lumpur", salary:8300},
+  {title:"Fullstack Engineer", location:"Kuala Lumpur", salary:8700},
+  {title:"Mobile Developer", location:"Penang", salary:7100},
+  {title:"Network Engineer", location:"Penang", salary:7400},
+  {title:"Security Analyst", location:"Penang", salary:7600},
+  {title:"Civil Supervisor", location:"Johor Bahru", salary:6900},
+  {title:"Site Engineer", location:"Johor Bahru", salary:7100},
+  {title:"Quality Manager", location:"Johor Bahru", salary:7500},
+  {title:"Project Coordinator", location:"Kuantan", salary:6600},
+  {title:"Structural Engineer", location:"Kuantan", salary:7200},
+  {title:"Estimator", location:"Kuantan", salary:6800},
+  {title:"Test Lead", location:"Ipoh", salary:7000},
+  {title:"Automation Engineer", location:"Ipoh", salary:7300},
+  {title:"Support Technician", location:"Ipoh", salary:6500},
+  {title:"Web Developer", location:"Malacca", salary:6000},
+  {title:"Database Admin", location:"Malacca", salary:6400},
+  {title:"IT Consultant", location:"Malacca", salary:6600},
+  {title:"C++ Developer", location:"Cyberjaya", salary:7500},
+  {title:"AI Engineer", location:"Cyberjaya", salary:8200},
+  {title:"Cloud Architect", location:"Cyberjaya", salary:9000},
+  {title:"Business Analyst", location:"Cyberjaya", salary:7700},
+  {title:"Lab Technician", location:"Putrajaya", salary:6800},
+  {title:"Policy Advisor", location:"Putrajaya", salary:7600},
+  {title:"Admin Officer", location:"Putrajaya", salary:6000},
+  {title:"Hardware Engineer", location:"George Town", salary:7200},
+  {title:"UX Researcher", location:"George Town", salary:7000},
+  {title:"Product Designer", location:"George Town", salary:7500},
+  {title:"Language Instructor", location:"Kota Kinabalu", salary:2000},
+  {title:"Tour Guide", location:"Kota Kinabalu", salary:2300},
+  {title:"Hotel Manager", location:"Kota Kinabalu", salary:3000},
+  {title:"Forest Ranger", location:"Kuching", salary:2600},
+  {title:"Marine Biologist", location:"Kuching", salary:2800},
+  {title:"Logistics Coordinator", location:"Kuching", salary:2500},
+  {title:"UX/UI Designer", location:"Shah Alam", salary:5800},
+  {title:"Digital Marketer", location:"Shah Alam", salary:5400},
+  {title:"Content Writer", location:"Shah Alam", salary:5200},
+  {title:"Sales Executive", location:"Petaling Jaya", salary:8600},
+  {title:"HR Specialist", location:"Petaling Jaya", salary:8200},
+  {title:"Financial Analyst", location:"Petaling Jaya", salary:9000},
+  {title:"Graphic Designer", location:"Seremban", salary:5000},
+  {title:"Customer Support", location:"Seremban", salary:4700},
+  {title:"Operations Manager", location:"Seremban", salary:5300}
 ];
 
 function normalize(s){
@@ -24,6 +67,16 @@ function normalize(s){
   // remove non-alnum except spaces
   s = s.replace(/[^\p{L}\p{N} ]+/gu,' ');
   return s.toLowerCase().trim().replace(/\s+/g,' ');
+}
+
+// basic front-end sanitization – strip characters commonly used in SQL/JS injection
+function sanitizeInput(str){
+  if(!str) return '';
+  // remove semicolons, quotes, double-dash, slash star etc.
+  return str.replace(/["'`;\\]/g,'')
+            .replace(/--/g,'')
+            .replace(/\/\*/g,'').replace(/\*\//g,'')
+            .trim();
 }
 
 function searchJobs(query, mode){
@@ -48,7 +101,14 @@ function searchJobs(query, mode){
       if(j.salary < minSalary) return false;
       const title = normalize(j.title);
       const loc = normalize(j.location);
-      return tokens.every(tok => title.includes(tok) || loc.includes(tok));
+      // generate acronym from location words (e.g. Kuala Lumpur -> KL)
+      const locWords = loc.split(' ').filter(w => w.length > 0);
+      const locAcronym = locWords.map(w => w[0]).join('');
+      return tokens.every(tok =>
+        title.includes(tok) ||
+        loc.includes(tok) ||
+        locAcronym.includes(tok)
+      );
     });
   }
   return [];
@@ -71,14 +131,12 @@ function autoSuggest(prefix, limit=8){
   return arr.slice(0, limit);
 }
 
-// UI wiring
 const input = document.getElementById('searchInput');
 const suggestionsEl = document.getElementById('suggestions');
 const searchBtn = document.getElementById('searchBtn');
 const modeSelect = document.getElementById('modeSelect');
 const resultsEl = document.getElementById('results');
 const paginationEl = document.getElementById('pagination');
-// page size input is no longer shown in the UI; keep a default value in case the element is removed
 const pageSizeInput = document.getElementById('pageSize');
 const DEFAULT_PAGE_SIZE = 5;
 
@@ -100,7 +158,20 @@ function renderResults(page=1){
   const to = Math.min(from+pageSize, total);
 
   resultsEl.innerHTML = '';
-  if(total === 0){ resultsEl.innerHTML = '<div class="job-card">No matches</div>'; paginationEl.innerHTML=''; return; }
+  if(total === 0){
+    // show a little apologetic person and suggestion
+    resultsEl.innerHTML = `
+      <div class="job-card no-results">
+        <div class="no-results-emoji">🙍‍♂️</div>
+        <div class="no-results-text">
+          Sorry, no results found.<br/>
+          Try clearing filters or broadening your search.
+        </div>
+      </div>
+    `;
+    paginationEl.innerHTML='';
+    return;
+  }
 
   for(let i=from;i<to;i++){
     const j = currentResults[i];
@@ -139,8 +210,9 @@ function renderResults(page=1){
 let suggestTimer = null;
 input.addEventListener('input', e => {
   clearTimeout(suggestTimer);
-  const v = e.target.value;
+  let v = e.target.value;
   if(!v) { suggestionsEl.innerHTML=''; suggestionsEl.style.display='none'; return; }
+  v = sanitizeInput(v);  // make sure suggestion algorithm sees cleaned string
   suggestTimer = setTimeout(()=>{
     const arr = autoSuggest(v, 8);
     suggestionsEl.innerHTML = '';
@@ -170,10 +242,20 @@ if(infoBtn && infoTooltip){
 
 
 searchBtn.addEventListener('click', ()=>{
-  const q = input.value.trim();
+  // sanitize before searching
+  const raw = input.value.trim();
+  const q = sanitizeInput(raw);
   const mode = modeSelect.value;
   currentResults = searchJobs(q, mode);
   renderResults(1);
+});
+
+// when user presses Enter in the search box, perform the search too
+input.addEventListener('keydown', e => {
+  if(e.key === 'Enter'){
+    e.preventDefault();
+    searchBtn.click();
+  }
 });
 
 if(pageSizeInput){
