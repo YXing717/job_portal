@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Profile</title>
+    <link rel="stylesheet" href="JobSeekProfileEdit.css">
+</head>
+<body>
+    <div class="container">
+        <header style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+                <!-- placeholder for profile image -->
+                <div style="width:100px;height:100px;background:#ccc;display:flex;align-items:center;justify-content:center;">
+                    profile image
+                </div>
+            </div>
+            <button onclick="goEdit()">Edit Profile</button>
+        </header>
+        <hr>
+        <section>
+            <h2>Skills</h2>
+            <ul id="view-skills"></ul>
+        </section>
+        <section>
+            <h2>Work Experience</h2>
+            <ul id="view-exp"></ul>
+        </section>
+    </div>
+    <script src="JobSeekProfile.js"></script>
+</body>
+</html>
