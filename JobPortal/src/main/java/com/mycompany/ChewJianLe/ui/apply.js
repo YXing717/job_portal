@@ -16,13 +16,11 @@ let applications = JSON.parse(localStorage.getItem('applications')) || [];
 // Detect current page
 // ------------------------
 document.addEventListener("DOMContentLoaded", () => {
-  const page = window.location.pathname;
-
-  if(page.includes("jobs.html")){
+  if(document.getElementById("results")) {
     renderJobs();
   }
 
-  if(page.includes("employer.html")){
+  if(document.getElementById("employerView")) {
     renderEmployer();
   }
 });
