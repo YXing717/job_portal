@@ -1,142 +1,180 @@
 // ------------------------
-// Temporary profile and applications
-// ------------------------
-let tempProfile = {
-  name: '',
-  email: '',
-  skills: [],
-  experience: 0
-};
-
-let applications = [];
-
-// ------------------------
-// Mock job data
+// Mock Jobs
 // ------------------------
 const jobs = [
-  {"id":1,"title":"Software Engineer","location":"Kuala Lumpur","salary":9000},
-  {"id":2,"title":"QA Engineer","location":"Ipoh","salary":6800},
-  {"id":3,"title":"Data Scientist","location":"Cyberjaya","salary":7800},
-  {"id":4,"title":"UX Designer","location":"Kuala Lumpur","salary":5500},
-  {"id":5,"title":"Frontend Developer","location":"Shah Alam","salary":5600}
+  {id:1,title:"Software Engineer",location:"Kuala Lumpur",salary:9000},
+  {id:2,title:"QA Engineer",location:"Ipoh",salary:6800},
+  {id:3,title:"Data Scientist",location:"Cyberjaya",salary:7800}
 ];
 
 // ------------------------
-// Save temporary profile
+// Get stored data
+// ------------------------
+let applications = JSON.parse(localStorage.getItem('applications')) || [];
+
+// ------------------------
+// Detect current page
+// ------------------------
+document.addEventListener("DOMContentLoaded", () => {
+  const page = window.location.pathname;
+
+  if(page.includes("jobs.html")){
+    renderJobs();
+  }
+
+  if(page.includes("employer.html")){
+    renderEmployer();
+  }
+});
+
+// ------------------------
+// PROFILE PAGE
 // ------------------------
 function saveProfile() {
-  const name = document.getElementById('name').value.trim();
-  const email = document.getElementById('email').value.trim();
-  const skills = document.getElementById('skills').value
-                   .split(',')
-                   .map(s => s.trim())
-                   .filter(s => s);
-  const experience = parseInt(document.getElementById('experience').value);
+  const profile = {
+    name: document.getElementById('name').value.trim(),
+    email: document.getElementById('email').value.trim(),
+    skills: document.getElementById('skills').value
+            .split(',')
+            .map(s => s.trim())
+            .filter(s => s),
+    experience: parseInt(document.getElementById('experience').value)
+  };
 
-  tempProfile.name = name;
-  tempProfile.email = email;
-  tempProfile.skills = skills;
-  tempProfile.experience = experience;
-
-  showMessage('Profile saved successfully!', 'success');
-  console.log('Temporary profile:', tempProfile);
+  localStorage.setItem('profile', JSON.stringify(profile));
+  showMessage("Profile saved successfully!", "success");
 }
 
 // ------------------------
-// Show messages
+// JOB PAGE
 // ------------------------
-function showMessage(msg, type='success') {
-  const messageEl = document.getElementById('message');
-  messageEl.textContent = msg;
-  messageEl.className = type === 'success' ? 'success' : 'error';
-  messageEl.style.display = 'block';
-  setTimeout(() => messageEl.style.display='none', 3000);
-}
+function renderJobs() {
+  const results = document.getElementById('results');
+  if(!results) return;
 
-// ------------------------
-// Render jobs
-// ------------------------
-function renderResults(jobs) {
-  const resultsEl = document.getElementById('results');
-  resultsEl.innerHTML = '';
+  results.innerHTML = '';
+
   jobs.forEach(job => {
-    const card = document.createElement('div');
-    card.className = 'job-card';
-    card.innerHTML = `
-      <div class="job-info">
-        <div class="job-title">${job.title}</div>
-        <div class="job-meta">${job.location} • RM${job.salary}</div>
+
+    const alreadyApplied = applications.some(a => a.jobId === job.id);
+
+    const div = document.createElement('div');
+    div.className = 'job-card';
+
+    div.innerHTML = `
+      <div>
+        <b>${job.title}</b><br>
+        ${job.location} • RM${job.salary}
       </div>
-      <button class="apply-btn">Apply Now</button>
+      <button ${alreadyApplied ? "disabled" : ""}>
+        ${alreadyApplied ? "Applied" : "Apply Now"}
+      </button>
     `;
-    const btn = card.querySelector('.apply-btn');
-    btn.addEventListener('click', () => applyJob(job, btn));
-    resultsEl.appendChild(card);
+
+    const btn = div.querySelector("button");
+    btn.onclick = () => applyJob(job);
+
+    results.appendChild(div);
+  });
+
+  renderDashboard();
+}
+
+function applyJob(job) {
+  const profile = JSON.parse(localStorage.getItem('profile'));
+
+  // Scenario 2
+  if(!profile || !profile.name || !profile.email || !profile.skills?.length || !profile.experience){
+    showMessage("Please complete your profile before applying.", "error");
+    return;
+  }
+
+  // Scenario 3
+  if(applications.some(a => a.jobId === job.id && a.email === profile.email)){
+    showMessage("You have already applied for this job.", "error");
+    return;
+  }
+
+  // Scenario 6 (simulate error)
+  const simulatedError = Math.random() < 0.1;
+  const status = simulatedError ? "Pending Review" : "Submitted";
+
+  const newApp = {
+    jobId: job.id,
+    title: job.title,
+    name: profile.name,
+    email: profile.email,
+    status: status
+  };
+
+  applications.push(newApp);
+  localStorage.setItem("applications", JSON.stringify(applications));
+
+  showMessage(
+    simulatedError
+      ? "System error occurred. Saved as Pending Review."
+      : "Application submitted successfully!",
+    simulatedError ? "error" : "success"
+  );
+
+  renderJobs();
+}
+
+function renderDashboard(){
+  const list = document.getElementById("appliedJobs");
+  if(!list) return;
+
+  list.innerHTML = '';
+
+  applications.forEach(app => {
+    const li = document.createElement("li");
+    li.textContent = `${app.title} - ${app.status}`;
+    list.appendChild(li);
   });
 }
 
 // ------------------------
-// Apply Now logic
+// EMPLOYER PAGE
 // ------------------------
-function applyJob(job, btn) {
-  const profile = tempProfile;
+function renderEmployer(){
+  const container = document.getElementById("employerView");
+  if(!container) return;
 
-  // Scenario 2: Incomplete profile
-  if(!profile.name || !profile.email || !profile.skills.length || !profile.experience){
-    showMessage('Please complete your profile before applying.', 'error');
-    return;
+  container.innerHTML = '';
+
+  const grouped = {};
+
+  applications.forEach(app => {
+    if(!grouped[app.jobId]){
+      grouped[app.jobId] = [];
+    }
+    grouped[app.jobId].push(app);
+  });
+
+  for(let jobId in grouped){
+    const section = document.createElement("div");
+    section.innerHTML = `<h3>Job ID ${jobId}</h3>`;
+
+    const ul = document.createElement("ul");
+
+    grouped[jobId].forEach(app => {
+      const li = document.createElement("li");
+      li.textContent = `${app.name} - ${app.status}`;
+      ul.appendChild(li);
+    });
+
+    section.appendChild(ul);
+    container.appendChild(section);
   }
-
-  // Scenario 3: Duplicate application
-  if(applications.some(a => a.jobId === job.id && a.email === profile.email)){
-    showMessage('You have already applied for this job.', 'error');
-    return;
-  }
-
-  // Scenario 6: Simulate system error (10% chance)
-  const simulatedError = Math.random() < 0.1;
-  const status = simulatedError ? 'Pending Review' : 'Submitted';
-
-  const app = { jobId: job.id, title: job.title, email: profile.email, status };
-  applications.push(app);
-
-  showMessage(simulatedError ? 
-              'System error occurred. Your application is saved as Pending Review.' : 
-              'Application submitted successfully!', 
-              simulatedError ? 'error' : 'success');
-
-  // Update dashboard
-  const dashboard = document.getElementById('appliedJobs');
-  const li = document.createElement('li');
-  li.innerHTML = `${job.title} <span class="status">${app.status}</span>`;
-  dashboard.appendChild(li);
-
-  // Update button
-  btn.textContent = 'Applied';
-  btn.disabled = true;
-
-  // -------------------------
-  // Employer view (Scenario 5)
-  // -------------------------
-  const employerView = document.getElementById('employerView');
-
-  // Create job section if not exists
-  let jobSection = document.getElementById(`job-${job.id}`);
-  if(!jobSection){
-    jobSection = document.createElement('div');
-    jobSection.id = `job-${job.id}`;
-    jobSection.innerHTML = `<h4>${job.title} Applicants:</h4><ul id="appList-${job.id}"></ul>`;
-    employerView.appendChild(jobSection);
-  }
-
-  // Add applicant to job
-  const appList = document.getElementById(`appList-${job.id}`);
-  const liEmp = document.createElement('li');
-  liEmp.textContent = `${profile.name} (${app.status})`;
-  appList.appendChild(liEmp);
 }
 
 // ------------------------
-// Render jobs on page load
+// Message
 // ------------------------
-renderResults(jobs);
+function showMessage(msg, type){
+  const message = document.getElementById("message");
+  if(!message) return;
+
+  message.textContent = msg;
+  message.className = type;
+}
