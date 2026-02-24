@@ -1,31 +1,23 @@
 let profileData = { skills: [], workExperiences: [] };
 
-const backendUrl = 'http://localhost:8080/profile';
-
-async function loadProfile() {
-    try {
-        const response = await fetch(backendUrl);
-        if (response.ok) {
-            const users = await response.json();
-            profileData = users[0].profile; // Assume single user
-            renderSkills();
-            renderExperiences();
+// Use localStorage to persist data in browser
+function loadProfile() {
+    const stored = localStorage.getItem('profileData');
+    if (stored) {
+        try {
+            profileData = JSON.parse(stored);
+        } catch (e) {
+            console.warn('Could not parse stored profile data', e);
         }
-    } catch (e) {
-        showMessage('Backend not connected', 'error');
     }
+    renderSkills();
+    renderExperiences();
 }
 
-async function saveProfile() {
+function saveProfile() {
     try {
-        const response = await fetch(backendUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify([{ profile: profileData }]) // Wrap in array for consistency
-        });
-        if (response.ok) {
-            showMessage('Saved to backend!', 'success');
-        }
+        localStorage.setItem('profileData', JSON.stringify(profileData));
+        showMessage('Saved locally!', 'success');
     } catch (e) {
         showMessage('Save failed', 'error');
     }
