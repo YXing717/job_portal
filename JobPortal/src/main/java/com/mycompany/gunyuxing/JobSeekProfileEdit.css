@@ -129,6 +129,9 @@ li {
     border: 1px solid #e0e0e0;
 }
 
+li.editing {
+    background: #e0f7fa;
+}
 section {
     margin-bottom: 30px;
 }
@@ -163,5 +166,15 @@ section h2 {
 }
 
 hr { border: none; height:1px; background:#ddd; margin:20px 0; }
+
+li span {
+    display: flex;
+    gap: 8px;
+}
+
+li span button {
+    padding: 4px 8px;
+    font-size: 14px;
+}
 
 /* confirmation dialog already styled inline, keep existing */

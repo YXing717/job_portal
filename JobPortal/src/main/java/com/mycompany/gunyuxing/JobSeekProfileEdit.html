@@ -15,7 +15,7 @@
             <div class="input-group">
                 <label for="skill-input">New skill</label>
                 <input type="text" id="skill-input" placeholder="Add skill">
-                <button onclick="addSkill()">Add</button>
+                <button id="skill-action" onclick="addSkill()">Add</button>
             </div>
             <ul id="skills-list"></ul>
         </section>
@@ -37,7 +37,7 @@
                 <label for="desc">Description</label>
                 <textarea id="desc" placeholder="Description"></textarea>
             </div>
-            <button onclick="addExperience()">Add</button>
+            <button id="exp-action" onclick="addExperience()">Add</button>
             <ul id="exp-list"></ul>
         </section>
         <button onclick="maybeSave()">Save Changes</button>
