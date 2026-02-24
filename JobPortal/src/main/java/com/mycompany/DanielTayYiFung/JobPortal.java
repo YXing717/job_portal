@@ -29,4 +29,33 @@ public class JobPortal extends JFrame{
             JOptionPane.showMessageDialog(this, "Error saving file");
         }
     }
+
+  private void displaySelectedJob() {
+        JobPost job = (JobPost) jobList.getSelectedItem();
+        
+        if (job != null) {
+            jobTitleField.setText(job.getJobTitle());
+            jobCompanyField.setText(job.getJobCompany());
+            jobLocationField.setText(job.getJobLocation());
+            jobDescriptionArea.setText(job.getJobDescription());
+            jobSalaryField.setText(String.valueOf(job.getJobSalary()));
+        }
+    }
+
+    private void updateJob() {
+        JobPost job = (JobPost) jobList.getSelectedItem();
+        
+        if (job != null) {
+            job.setJobTitle(jobTitleField.getText());
+            job.setJobCompany(jobCompanyField.getText());
+            job.setJobLocation(jobLocationField.getText());
+            job.setJobDescription(jobDescriptionArea.getText());
+            job.setJobSalary(Double.parseDouble(jobSalaryField.getText()));
+
+            saveJobs();
+            jobList.repaint();
+
+            JOptionPane.showMessageDialog(this, "Job updated successfully!");
+        }
+    }
 }
