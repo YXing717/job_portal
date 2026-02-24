@@ -1,9 +1,6 @@
 let profileData = { skills: [], workExperiences: [] };
 // separate object to hold unsaved changes shown in editing area
 let stagedData = { skills: [], workExperiences: [] };
-// removal toggle state for each section
-let skillRemoveMode = false;
-let expRemoveMode = false;
 
 // Use localStorage to persist data in browser
 function loadProfile() {
@@ -15,8 +12,11 @@ function loadProfile() {
             console.warn('Could not parse stored profile data', e);
         }
     }
-    // when loading from storage, clear any staged changes
-    stagedData = { skills: [], workExperiences: [] };
+    // staging area starts as a copy of saved profile
+    stagedData = {
+        skills: profileData.skills ? profileData.skills.slice() : [],
+        workExperiences: profileData.workExperiences ? profileData.workExperiences.slice() : []
+    };
     renderSkills();
     renderExperiences();
 }
@@ -33,9 +33,7 @@ function saveProfile() {
         showMessage('Saved locally!', 'success');
         // clear staged edits and UI lists
         stagedData = { skills: [], workExperiences: [] };
-        // exiting remove mode after save
-        skillRemoveMode = false;
-        expRemoveMode = false;
+        // no remove-mode state to reset
         renderSkills();
         renderExperiences();
         // after saving, navigate back to view page
@@ -56,19 +54,6 @@ function formHasUnsubmittedData() {
     return skillInput !== '' || title !== '' || company !== '' || start !== '' || end !== '' || desc !== '';
 }
 
-// toggle remove mode for skills
-function toggleSkillRemove() {
-    skillRemoveMode = !skillRemoveMode;
-    document.getElementById('toggle-skill-remove').textContent = skillRemoveMode ? 'Done' : 'Remove';
-    renderSkills();
-}
-
-// toggle remove mode for experiences
-function toggleExpRemove() {
-    expRemoveMode = !expRemoveMode;
-    document.getElementById('toggle-exp-remove').textContent = expRemoveMode ? 'Done' : 'Remove';
-    renderExperiences();
-}
 
 function maybeSave() {
     const suppressed = localStorage.getItem('suppressIncompleteWarning');
@@ -106,8 +91,7 @@ function renderSkills() {
     const list = document.getElementById('skills-list');
     list.innerHTML = '';
     stagedData.skills.forEach((skill, idx) => {
-        const btnLabel = skillRemoveMode ? '-' : 'Remove';
-        list.innerHTML += `<li>${skill} <button onclick="removeSkill(${idx})">${btnLabel}</button></li>`;
+        list.innerHTML += `<li>${skill} <button onclick="removeSkill(${idx})">Remove</button></li>`;
     });
 }
 
@@ -129,10 +113,9 @@ function renderExperiences() {
     const list = document.getElementById('exp-list');
     list.innerHTML = '';
     stagedData.workExperiences.forEach((exp, idx) => {
-        const btnLabel = expRemoveMode ? '-' : 'Remove';
         list.innerHTML += `<li>
             ${exp.jobTitle} at ${exp.company} (${exp.startDate} - ${exp.endDate})<br>${exp.description}
-            <button onclick="removeExperience(${idx})">${btnLabel}</button>
+            <button onclick="removeExperience(${idx})">Remove</button>
         </li>`;
     });
 }
