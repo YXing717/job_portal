@@ -113,4 +113,8 @@ public class JobPortal extends JFrame{
             JOptionPane.showMessageDialog(this, "Job updated successfully!");
         }
     }
+
+  public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new JobPortal().setVisible(true));
+    }
 }
