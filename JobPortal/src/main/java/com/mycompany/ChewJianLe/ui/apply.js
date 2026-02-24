@@ -93,10 +93,17 @@ function applyJob(job, btn) {
     return;
   }
 
-  // Scenario 4 & 8: Save application
-  const app = { jobId: job.id, title: job.title, email: profile.email, status: 'Submitted' };
+  // Scenario 6: Simulate system error (10% chance)
+  const simulatedError = Math.random() < 0.1;
+  const status = simulatedError ? 'Pending Review' : 'Submitted';
+
+  const app = { jobId: job.id, title: job.title, email: profile.email, status };
   applications.push(app);
-  showMessage('Application submitted successfully!', 'success');
+
+  showMessage(simulatedError ? 
+              'System error occurred. Your application is saved as Pending Review.' : 
+              'Application submitted successfully!', 
+              simulatedError ? 'error' : 'success');
 
   // Update dashboard
   const dashboard = document.getElementById('appliedJobs');
@@ -108,8 +115,25 @@ function applyJob(job, btn) {
   btn.textContent = 'Applied';
   btn.disabled = true;
 
-  // Scenario 5: Employer view simulated in console
-  console.log(`Applicant for "${job.title}":`, profile.name);
+  // -------------------------
+  // Employer view (Scenario 5)
+  // -------------------------
+  const employerView = document.getElementById('employerView');
+
+  // Create job section if not exists
+  let jobSection = document.getElementById(`job-${job.id}`);
+  if(!jobSection){
+    jobSection = document.createElement('div');
+    jobSection.id = `job-${job.id}`;
+    jobSection.innerHTML = `<h4>${job.title} Applicants:</h4><ul id="appList-${job.id}"></ul>`;
+    employerView.appendChild(jobSection);
+  }
+
+  // Add applicant to job
+  const appList = document.getElementById(`appList-${job.id}`);
+  const liEmp = document.createElement('li');
+  liEmp.textContent = `${profile.name} (${app.status})`;
+  appList.appendChild(liEmp);
 }
 
 // ------------------------
