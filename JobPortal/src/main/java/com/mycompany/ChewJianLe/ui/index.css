@@ -1,0 +1,30 @@
+#dashboard { 
+  margin-top: 20px; 
+  background: #fff; 
+  padding: 15px; 
+  border-radius: 5px; 
+  box-shadow: 0 1px 5px rgba(0,0,0,0.1); 
+}
+
+#appliedJobs {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#appliedJobs li {
+  background: #f8f9fa;
+  margin: 8px 0;
+  padding: 10px 12px;
+  border-radius: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  font-size: 0.95em;
+}
+
+#appliedJobs li span.status {
+  font-weight: bold;
+  color: #007bff;
+}
