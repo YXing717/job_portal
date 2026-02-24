@@ -218,7 +218,7 @@ function renderResults(page=1){
     // show a little apologetic person and suggestion
     resultsEl.innerHTML = `
       <div class="job-card no-results">
-        <div class="no-results-emoji">🙍‍♂️</div>
+        <div class="no-results-emoji anime-emoji">😭</div>
         <div class="no-results-text">
           Sorry, no results found.<br/>
           Try clearing filters or broadening your search.
@@ -233,9 +233,13 @@ function renderResults(page=1){
     const j = currentResults[i];
     const card = document.createElement('div'); card.className='job-card';
     const left = document.createElement('div'); left.className='job-left';
+    // icon representing a briefcase for jobs
+    const icon = document.createElement('div'); icon.className='job-icon'; icon.textContent = '💼';
     const title = document.createElement('div'); title.className='job-title'; title.textContent = j.title;
     const meta = document.createElement('div'); meta.className='job-meta'; meta.textContent = `${j.location} • RM${j.salary.toLocaleString()}`;
-    left.appendChild(title); left.appendChild(meta);
+    left.appendChild(icon);
+    left.appendChild(title);
+    left.appendChild(meta);
     const right = document.createElement('div'); right.className='job-right'; right.textContent = '';
     card.appendChild(left); card.appendChild(right);
     // show detail modal when clicking the card
@@ -300,12 +304,17 @@ if(infoBtn && infoTooltip){
 
 
 searchBtn.addEventListener('click', ()=>{
-  // sanitize before searching
-  const raw = input.value.trim();
-  const q = sanitizeInput(raw);
-  const mode = modeSelect.value;
-  currentResults = searchJobs(q, mode);
-  renderResults(1);
+  // show loading state
+  searchBtn.classList.add('loading');
+  setTimeout(()=>{
+    // sanitize before searching
+    const raw = input.value.trim();
+    const q = sanitizeInput(raw);
+    const mode = modeSelect.value;
+    currentResults = searchJobs(q, mode);
+    renderResults(1);
+    searchBtn.classList.remove('loading');
+  }, 150); // slight delay so spinner is visible
 });
 
 // when user presses Enter in the search box, perform the search too
