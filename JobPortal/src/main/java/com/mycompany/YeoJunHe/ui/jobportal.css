@@ -42,3 +42,9 @@ select{padding:10px;border-radius:8px;background:#07122a;border:1px solid rgba(2
 .page-btn{padding:8px 10px;background:transparent;border:1px solid rgba(255,255,255,0.04);border-radius:8px;color:var(--muted);cursor:pointer}
 .page-btn.active{background:var(--accent);color:white;border:none}
 .foot{margin-top:22px;color:var(--muted);font-size:13px;text-align:center}
+
+/* modal for job description */
+.modal{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);display:none;align-items:center;justify-content:center;z-index:100}
+.modal-content{background:var(--card);padding:20px;border-radius:12px;max-width:500px;position:relative;color:inherit}
+.modal-close{position:absolute;top:8px;right:8px;background:none;border:none;color:var(--muted);font-size:24px;cursor:pointer}
+

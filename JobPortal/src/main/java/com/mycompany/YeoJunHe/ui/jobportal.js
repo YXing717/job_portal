@@ -105,6 +105,36 @@ function sanitizeInput(str){
             .trim();
 }
 
+// generate description text for a job object if not already present
+function buildDescription(job){
+  // simple generic description based on title and location
+  const words = job.title.split(' ').map(w => w.toLowerCase());
+  return `The ${job.title} role in ${job.location} requires experience with ${words.join(', ')} and related skills.`;
+}
+// ensure every job has a description property
+JOBS.forEach(j => { if(!j.description) j.description = buildDescription(j); });
+
+// modal helpers
+const modal = document.getElementById('detailModal');
+const modalTitle = document.getElementById('modalTitle');
+const modalMeta = document.getElementById('modalMeta');
+const modalDescription = document.getElementById('modalDescription');
+const modalClose = document.getElementById('modalClose');
+function openModal(job){
+  modalTitle.textContent = job.title;
+  modalMeta.textContent = `${job.location} • RM${job.salary.toLocaleString()}`;
+  modalDescription.textContent = job.description;
+  modal.style.display = 'flex';
+  modal.setAttribute('aria-hidden','false');
+}
+function closeModal(){
+  modal.style.display = 'none';
+  modal.setAttribute('aria-hidden','true');
+}
+modalClose.addEventListener('click', closeModal);
+// optionally close when clicking outside content
+modal.addEventListener('click', e => { if(e.target === modal) closeModal(); });
+
 function searchJobs(query, mode){
   const q = normalize(query);
   if(mode === 'exact') return JOBS.filter(j => normalize(j.title) === q);
@@ -208,6 +238,8 @@ function renderResults(page=1){
     left.appendChild(title); left.appendChild(meta);
     const right = document.createElement('div'); right.className='job-right'; right.textContent = '';
     card.appendChild(left); card.appendChild(right);
+    // show detail modal when clicking the card
+    card.addEventListener('click', () => openModal(j));
     resultsEl.appendChild(card);
   }
 
