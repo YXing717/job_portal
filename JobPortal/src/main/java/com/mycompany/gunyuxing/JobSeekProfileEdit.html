@@ -12,6 +12,7 @@
             <h2>Skills</h2>
             <input type="text" id="skill-input" placeholder="Add skill">
             <button onclick="addSkill()">Add</button>
+            <button id="toggle-skill-remove" onclick="toggleSkillRemove()">Remove</button>
             <ul id="skills-list"></ul>
         </section>
         <section class="experience">
@@ -22,11 +23,26 @@
             <input type="text" id="end" placeholder="End (YYYY-MM or Present)">
             <textarea id="desc" placeholder="Description"></textarea>
             <button onclick="addExperience()">Add</button>
+            <button id="toggle-exp-remove" onclick="toggleExpRemove()">Remove</button>
             <ul id="exp-list"></ul>
         </section>
-        <button onclick="saveProfile()">Save Changes</button>
+        <button onclick="maybeSave()">Save Changes</button>
         <div id="message"></div>
     </div>
+
+    <!-- confirmation dialog for incomplete edits -->
+    <div id="confirm-dialog" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+         background:rgba(0,0,0,0.5); align-items:center; justify-content:center;">
+        <div style="background:white; padding:20px; border-radius:8px; max-width:400px; margin:auto;">
+            <p>Your edit is not yet complete. Are you sure you want to continue?</p>
+            <label><input type="checkbox" id="dont-show-check"> Don't show again</label>
+            <div style="margin-top:15px; text-align:right;">
+                <button onclick="proceedConfirm()">Proceed</button>
+                <button onclick="cancelConfirm()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <script src="JobSeekProfileEdit.js"></script>
 </body>
 </html>
