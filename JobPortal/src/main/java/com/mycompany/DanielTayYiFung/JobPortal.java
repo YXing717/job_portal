@@ -1,5 +1,60 @@
 public class JobPortal extends JFrame{
+  private JComboBox<JobPost> jobList;
+  private JTextField jobTitleField;
+  private JTextField jobCompanyField;
+  private JTextField jobLocationField;
+  private JTextArea jobDescriptionArea;
+  private JTextField jobSalaryField;
+
+  private ArrayList<JobPost> jobs = new ArrayList<>();
   private final String FILE_NAME = "jobs.txt";
+
+  public JobPortal() {
+        loadJobs();
+
+        setTitle("Edit Job Post");
+        setSize(500, 400);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setLayout(new BorderLayout());
+
+        // Dropdown list of jobs
+        jobList = new JComboBox<>(jobs.toArray(new JobPost[0]));
+        add(jobList, BorderLayout.NORTH);
+
+        JPanel form = new JPanel(new GridLayout(5, 2, 10, 10));
+
+        form.add(new JLabel("Job Title:"));
+        jobTitleField = new JTextField();
+        form.add(jobTitleField);
+
+        form.add(new JLabel("Company:"));
+        jobCompanyField = new JTextField();
+        form.add(jobCompanyField);
+
+        form.add(new JLabel("Location:"));
+        jobLocationField = new JTextField();
+        form.add(jobLocationField);
+
+        form.add(new JLabel("Description:"));
+        jobDescriptionArea = new JTextArea();
+        form.add(new JScrollPane(jobDescriptionArea));
+
+        form.add(new JLabel("Salary:"));
+        jobSalaryField = new JTextField();
+        form.add(jobSalaryField);
+
+        add(form, BorderLayout.CENTER);
+
+        JButton updateBtn = new JButton("Update Job");
+        add(updateBtn, BorderLayout.SOUTH);
+
+        jobList.addActionListener(e -> displaySelectedJob());
+        updateBtn.addActionListener(e -> updateJob());
+
+        if (!jobs.isEmpty()) {
+            displaySelectedJob();
+        }
+    }
   
   private void loadJobs() {
         try (BufferedReader br = new BufferedReader(new FileReader(FILE_NAME))) {
@@ -30,7 +85,7 @@ public class JobPortal extends JFrame{
         }
     }
 
-  private void displaySelectedJob() {
+    private void displaySelectedJob() {
         JobPost job = (JobPost) jobList.getSelectedItem();
         
         if (job != null) {
