@@ -6,17 +6,14 @@
     <link rel="stylesheet" href="JobSeekProfileEdit.css">
 </head>
 <body>
-    <div class="container">
-        <header style="display:flex; justify-content:space-between; align-items:center;">
-            <div>
-                <!-- placeholder for profile image -->
-                <div style="width:100px;height:100px;background:#ccc;display:flex;align-items:center;justify-content:center;">
-                    profile image
-                </div>
-            </div>
+    <header>
+        <div class="profile-header">
+            <div class="avatar">profile image</div>
+            <h1>My Profile</h1>
             <button onclick="goEdit()">Edit Profile</button>
-        </header>
-        <hr>
+        </div>
+    </header>
+    <div class="container">
         <section>
             <h2>Skills</h2>
             <ul id="view-skills"></ul>

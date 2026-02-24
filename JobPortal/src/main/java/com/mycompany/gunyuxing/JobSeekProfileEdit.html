@@ -6,21 +6,37 @@
     <link rel="stylesheet" href="JobSeekProfileEdit.css">
 </head>
 <body>
-    <div class="container">
+    <header>
         <h1>Edit Profile</h1>
+    </header>
+    <div class="container">
         <section class="skills">
             <h2>Skills</h2>
-            <input type="text" id="skill-input" placeholder="Add skill">
-            <button onclick="addSkill()">Add</button>
+            <div class="input-group">
+                <label for="skill-input">New skill</label>
+                <input type="text" id="skill-input" placeholder="Add skill">
+                <button onclick="addSkill()">Add</button>
+            </div>
             <ul id="skills-list"></ul>
         </section>
         <section class="experience">
             <h2>Work Experience</h2>
-            <input type="text" id="title" placeholder="Title">
-            <input type="text" id="company" placeholder="Company">
-            <input type="text" id="start" placeholder="Start (YYYY-MM)">
-            <input type="text" id="end" placeholder="End (YYYY-MM or Present)">
-            <textarea id="desc" placeholder="Description"></textarea>
+            <div class="form-group">
+                <label for="title">Title</label>
+                <input type="text" id="title" placeholder="Job title">
+                <label for="company">Company</label>
+                <input type="text" id="company" placeholder="Company name">
+            </div>
+            <div class="form-group">
+                <label for="start">Start</label>
+                <input type="text" id="start" placeholder="YYYY-MM">
+                <label for="end">End</label>
+                <input type="text" id="end" placeholder="YYYY-MM or Present">
+            </div>
+            <div class="form-group">
+                <label for="desc">Description</label>
+                <textarea id="desc" placeholder="Description"></textarea>
+            </div>
             <button onclick="addExperience()">Add</button>
             <ul id="exp-list"></ul>
         </section>
