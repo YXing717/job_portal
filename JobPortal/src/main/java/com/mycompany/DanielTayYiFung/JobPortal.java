@@ -1,3 +1,5 @@
+package com.mycompany.job_portal;
+
 public class JobPortal extends JFrame{
   private JComboBox<JobPost> jobList;
   private JTextField jobTitleField;
@@ -114,7 +116,7 @@ public class JobPortal extends JFrame{
         }
     }
 
-  public static void main(String[] args) {
+    public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> new JobPortal().setVisible(true));
     }
 }
