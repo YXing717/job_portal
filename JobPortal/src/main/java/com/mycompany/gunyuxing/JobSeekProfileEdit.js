@@ -37,7 +37,7 @@ function saveProfile() {
         };
 
         localStorage.setItem('profileData', JSON.stringify(profileData));
-        showMessage('Saved locally!', 'success');
+        showMessage('Saved locally!', 'success', 'message');
         // clear staged edits and UI lists
         stagedData = { skills: [], workExperiences: [] };
         // no remove-mode state to reset
@@ -46,7 +46,7 @@ function saveProfile() {
         // after saving, navigate back to view page
         window.location.href = 'JobSeekProfile.html';
     } catch (e) {
-        showMessage('Save failed', 'error');
+        showMessage('Save failed', 'error', 'message');
     }
 }
 
@@ -140,7 +140,7 @@ function addSkill() {
         inputEl.value = '';
         dropdown.selectedIndex = 0;
         renderSkills();
-        if (!added) showMessage('Please enter or select a unique skill', 'error');
+        if (!added) showMessage('Please enter or select a unique skill', 'error', 'skill-message');
         return;
     } else {
         if (input) {
@@ -157,12 +157,12 @@ function addSkill() {
     inputEl.value = '';
     dropdown.selectedIndex = 0;
     if (!added) {
-        showMessage('Please enter or select a unique skill', 'error');
+        showMessage('Please enter or select a unique skill', 'error', 'skill-message');
         return;
     }
     renderSkills();
     if (!added) {
-        showMessage('Please enter or select a skill', 'error');
+        showMessage('Please enter or select a skill', 'error', 'skill-message');
         return;
     }
     inputEl.value = '';
@@ -221,7 +221,17 @@ function startExpEdit(idx) {
     document.getElementById('title').value = exp.jobTitle;
     document.getElementById('company').value = exp.company;
     document.getElementById('start').value = exp.startDate;
-    document.getElementById('end').value = exp.endDate;
+
+    if (exp.endDate === 'Present') {
+        document.getElementById('until-present').checked = true;
+        document.getElementById('end').value = '';
+        document.getElementById('end').disabled = true;
+    } else {
+        document.getElementById('until-present').checked = false;
+        document.getElementById('end').value = exp.endDate;
+        document.getElementById('end').disabled = false;
+    }
+
     document.getElementById('desc').value = exp.description;
     updateExpButton();
     updateSkillButton();
@@ -234,22 +244,38 @@ function updateExpButton() {
     btn.disabled = editingSkill >= 0;
 }
 
+function toggleEndPicker() {
+    const checkbox = document.getElementById('until-present');
+    const endInput = document.getElementById('end');
+    if (checkbox.checked) {
+        endInput.value = '';
+        endInput.disabled = true;
+    } else {
+        endInput.disabled = false;
+    }
+}
+
 function clearExperienceForm() {
     document.getElementById('title').value = '';
     document.getElementById('company').value = '';
     document.getElementById('start').value = '';
     document.getElementById('end').value = '';
+    document.getElementById('end').disabled = false;
+    document.getElementById('until-present').checked = false;
     document.getElementById('desc').value = '';
 }
 function addExperience() {
+    const isPresent = document.getElementById('until-present').checked;
     const expObj = {
         jobTitle: document.getElementById('title').value.trim(),
         company: document.getElementById('company').value.trim(),
         startDate: document.getElementById('start').value.trim(),
-        endDate: document.getElementById('end').value.trim(),
+        endDate: isPresent ? 'Present' : document.getElementById('end').value.trim(),
         description: document.getElementById('desc').value.trim()
     };
-    if (!expObj.jobTitle || !expObj.company) return showMessage('Missing fields', 'error');
+    if (!expObj.jobTitle || !expObj.company || !expObj.startDate || (!isPresent && !expObj.endDate)) {
+        return showMessage('Missing fields', 'error', 'exp-message');
+    }
     if (editingExp >= 0) {
         stagedData.workExperiences[editingExp] = expObj;
         editingExp = -1;
@@ -275,15 +301,9 @@ function removeExperience(idx) {
     renderExperiences();
 }
 
-function showMessage(msg, type) {
-    // Use skill-message div for skill errors, fallback to main message for others
-    const skillMsg = document.getElementById('skill-message');
-    const mainMsg = document.getElementById('message');
-    let el = mainMsg;
-    // Only use skillMsg for skill errors/success
-    if (skillMsg && (type === 'error' || type === 'success')) {
-        el = skillMsg;
-    }
+function showMessage(msg, type, targetId) {
+    let el = document.getElementById(targetId || 'message');
+    if (!el) el = document.getElementById('message');
     el.textContent = msg;
     el.className = type;
     el.style.display = 'block';

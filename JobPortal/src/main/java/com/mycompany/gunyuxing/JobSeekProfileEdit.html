@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Edit Profile</title>
     <link rel="stylesheet" href="JobSeekProfileEdit.css">
 </head>
+
 <body>
     <header>
         <h1>Edit Profile - YXING</h1>
@@ -15,7 +17,8 @@
             <div class="input-group">
                 <label for="skill-input">New skill</label>
                 <input type="text" id="skill-input" placeholder="Add skill">
-                <select id="skill-suggestion" style="margin-top:8px;display:block;width:100%;padding:8px 10px;border-radius:6px;border:1px solid #ccc;font-size:15px;">
+                <select id="skill-suggestion"
+                    style="margin-top:8px;display:block;width:100%;padding:8px 10px;border-radius:6px;border:1px solid #ccc;font-size:15px;">
                     <option value="" disabled selected hidden>Skill Suggestion</option>
                     <option value="Python">Python</option>
                     <option value="JavaScript">JavaScript</option>
@@ -30,8 +33,8 @@
                     <option value="TypeScript">TypeScript</option>
                 </select>
                 <div id="skill-message"></div>
-                <button id="skill-action" onclick="addSkill()">Add</button>
             </div>
+            <button id="skill-action" onclick="addSkill()">Add</button>
             <ul id="skills-list"></ul>
         </section>
         <section class="experience">
@@ -44,14 +47,22 @@
             </div>
             <div class="form-group">
                 <label for="start">Start</label>
-                <input type="text" id="start" placeholder="YYYY-MM">
+                <input type="date" id="start" onkeydown="return false" onfocus="this.showPicker()">
                 <label for="end">End</label>
-                <input type="text" id="end" placeholder="YYYY-MM or Present">
+                <div style="display:flex; flex-direction:column; width:100%; gap:5px;">
+                    <input type="date" id="end" onkeydown="return false" onfocus="this.showPicker()">
+                    <label
+                        style="display:flex; align-items:center; gap:5px; font-weight:normal; font-size:14px; margin-top:5px; cursor:pointer;">
+                        <input type="checkbox" id="until-present" style="width:auto; margin:0;"
+                            onchange="toggleEndPicker()"> Until Present
+                    </label>
+                </div>
             </div>
             <div class="form-group">
-                <label for="desc">Description</label>
+                <label for="desc">Description (Optional)</label>
                 <textarea id="desc" placeholder="Description"></textarea>
             </div>
+            <div id="exp-message"></div>
             <button id="exp-action" onclick="addExperience()">Add</button>
             <ul id="exp-list"></ul>
         </section>
@@ -74,4 +85,5 @@
 
     <script src="JobSeekProfileEdit.js"></script>
 </body>
+
 </html>
