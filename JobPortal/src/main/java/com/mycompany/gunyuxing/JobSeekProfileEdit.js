@@ -100,7 +100,6 @@ function renderSkills() {
     stagedData.skills.forEach((skill, idx) => {
         const cls = idx === editingSkill ? ' class="editing"' : '';
         list.innerHTML += `<li${cls}>${skill} <span>
-            <button onclick="startSkillEdit(${idx})">Edit</button>
             <button onclick="removeSkill(${idx})">Remove</button>
         </span></li>`;
     });
@@ -109,20 +108,65 @@ function renderSkills() {
 
 function addSkill() {
     const inputEl = document.getElementById('skill-input');
+    const dropdown = document.getElementById('skill-suggestion');
     const input = inputEl.value.trim();
-    if (!input) return showMessage('Empty skill', 'error');
+    const dropdownValue = dropdown.value;
+    let added = false;
     if (editingSkill >= 0) {
         // finish editing
-        stagedData.skills[editingSkill] = input;
+        if (input) {
+            stagedData.skills[editingSkill] = input;
+            added = true;
+        }
         editingSkill = -1;
         inputEl.value = '';
+        dropdown.selectedIndex = 0;
         updateSkillButton();
         updateExpButton();
         renderSkills();
         return;
     }
-    stagedData.skills.push(input);
+    // If both input and dropdown are filled and equal (case-insensitive), only add dropdown
+    // Normalize all staged skills for case-insensitive comparison
+    const stagedLower = stagedData.skills.map(s => s.toLowerCase());
+    // If both input and dropdown are filled and equal (case-insensitive), only add dropdown if not exists
+    if (
+        input && dropdownValue && dropdownValue !== "" && input.toLowerCase() === dropdownValue.toLowerCase()
+    ) {
+        if (!stagedLower.includes(dropdownValue.toLowerCase())) {
+            stagedData.skills.push(dropdownValue);
+            added = true;
+        }
+        inputEl.value = '';
+        dropdown.selectedIndex = 0;
+        renderSkills();
+        if (!added) showMessage('Please enter or select a unique skill', 'error');
+        return;
+    } else {
+        if (input) {
+            if (!stagedLower.includes(input.toLowerCase())) {
+                stagedData.skills.push(input);
+                added = true;
+            }
+        }
+        if (dropdownValue && dropdownValue !== "" && !stagedLower.includes(dropdownValue.toLowerCase())) {
+            stagedData.skills.push(dropdownValue);
+            added = true;
+        }
+    }
     inputEl.value = '';
+    dropdown.selectedIndex = 0;
+    if (!added) {
+        showMessage('Please enter or select a unique skill', 'error');
+        return;
+    }
+    renderSkills();
+    if (!added) {
+        showMessage('Please enter or select a skill', 'error');
+        return;
+    }
+    inputEl.value = '';
+    dropdown.selectedIndex = 0;
     renderSkills();
 }
 
@@ -232,9 +276,20 @@ function removeExperience(idx) {
 }
 
 function showMessage(msg, type) {
-    const div = document.getElementById('message');
-    div.textContent = msg;
-    div.className = type;
+    // Use skill-message div for skill errors, fallback to main message for others
+    const skillMsg = document.getElementById('skill-message');
+    const mainMsg = document.getElementById('message');
+    let el = mainMsg;
+    // Only use skillMsg for skill errors/success
+    if (skillMsg && (type === 'error' || type === 'success')) {
+        el = skillMsg;
+    }
+    el.textContent = msg;
+    el.className = type;
+    el.style.display = 'block';
+    setTimeout(() => {
+        el.style.display = 'none';
+    }, 2500);
 }
 
 

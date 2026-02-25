@@ -7,19 +7,31 @@ function loadViewProfile() {
     try {
         const data = JSON.parse(stored);
         const skillsEl = document.getElementById('view-skills');
+        const noSkillsMsg = document.getElementById('no-skills-msg');
         skillsEl.innerHTML = '';
-        (data.skills || []).forEach(s => {
-            const li = document.createElement('li');
-            li.textContent = s;
-            skillsEl.appendChild(li);
-        });
+        if (data.skills && data.skills.length > 0) {
+            noSkillsMsg.style.display = 'none';
+            data.skills.forEach(s => {
+                const li = document.createElement('li');
+                li.textContent = s;
+                skillsEl.appendChild(li);
+            });
+        } else {
+            noSkillsMsg.style.display = 'block';
+        }
         const expEl = document.getElementById('view-exp');
+        const noExpMsg = document.getElementById('no-exp-msg');
         expEl.innerHTML = '';
-        (data.workExperiences || []).forEach(exp => {
-            const li = document.createElement('li');
-            li.innerHTML = `${exp.jobTitle} at ${exp.company} (${exp.startDate} - ${exp.endDate})<br>${exp.description}`;
-            expEl.appendChild(li);
-        });
+        if (data.workExperiences && data.workExperiences.length > 0) {
+            noExpMsg.style.display = 'none';
+            data.workExperiences.forEach(exp => {
+                const li = document.createElement('li');
+                li.innerHTML = `${exp.jobTitle} at ${exp.company} (${exp.startDate} - ${exp.endDate})<br>${exp.description}`;
+                expEl.appendChild(li);
+            });
+        } else {
+            noExpMsg.style.display = 'block';
+        }
     } catch (e) {
         console.warn('failed to parse profile data', e);
     }
