@@ -30,6 +30,9 @@ function loadProfile() {
 
 function saveProfile() {
     try {
+        const hasChanges = JSON.stringify(profileData.skills) !== JSON.stringify(stagedData.skills) ||
+            JSON.stringify(profileData.workExperiences) !== JSON.stringify(stagedData.workExperiences);
+
         // replace the saved profile with whatever is currently staged (update)
         profileData = {
             skills: stagedData.skills.slice(),
@@ -37,6 +40,7 @@ function saveProfile() {
         };
 
         localStorage.setItem('profileData', JSON.stringify(profileData));
+        localStorage.setItem('profile_updated_success', hasChanges ? 'updated' : 'no_changes');
         showMessage('Saved locally!', 'success', 'message');
         // clear staged edits and UI lists
         stagedData = { skills: [], workExperiences: [] };

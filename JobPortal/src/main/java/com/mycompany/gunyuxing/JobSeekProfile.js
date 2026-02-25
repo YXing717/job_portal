@@ -102,7 +102,14 @@ document.addEventListener('DOMContentLoaded', function () {
             aboutMeText.focus();
         } else {
             setAboutEditMode(false);
-            localStorage.setItem(ABOUT_KEY, aboutMeText.value);
+            const oldVal = localStorage.getItem(ABOUT_KEY);
+            const newVal = aboutMeText.value;
+            if (oldVal !== newVal) {
+                localStorage.setItem(ABOUT_KEY, newVal);
+                showFlashMessage('About me updated!');
+            } else {
+                showFlashMessage('No changes made');
+            }
         }
     });
 
@@ -113,8 +120,29 @@ document.addEventListener('DOMContentLoaded', function () {
     if (savedLoc) locationSelect.value = savedLoc;
     locationSelect.addEventListener('change', function () {
         localStorage.setItem(LOC_KEY, locationSelect.value);
+        showFlashMessage('Location updated!');
     });
+
+    // Check for success flag from edit page
+    const successFlag = localStorage.getItem('profile_updated_success');
+    if (successFlag === 'updated') {
+        showFlashMessage('Profile successfully updated!');
+        localStorage.removeItem('profile_updated_success');
+    } else if (successFlag === 'no_changes') {
+        showFlashMessage('No changes made');
+        localStorage.removeItem('profile_updated_success');
+    }
 });
+
+function showFlashMessage(msg) {
+    const el = document.getElementById('successMessage');
+    if (!el) return;
+    el.textContent = msg;
+    el.style.display = 'block';
+    setTimeout(() => {
+        el.style.display = 'none';
+    }, 3000);
+}
 
 // run on load
 loadViewProfile();

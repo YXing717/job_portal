@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>My Profile</title>
     <link rel="stylesheet" href="JobSeekProfileEdit.css">
 </head>
+
 <body>
     <header>
         <div class="profile-header">
@@ -12,10 +14,12 @@
                 <img id="profileImage" class="profile-img" src="" alt="profile image" />
                 <span class="profile-img-placeholder" id="profileImgPlaceholder">profile image</span>
                 <label for="profileImgInput" class="profile-img-pen">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="#2196f3" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="background: #fff; border-radius: 50%; padding: 4px; box-shadow: 0 2px 6px #0002; cursor: pointer;">
-                        <circle cx="12" cy="12" r="12" fill="#fff"/>
-                        <path d="M12.5 6.5l5 5-8 8H4.5v-4.5z"/>
-                        <path d="M15.5 9.5l-1-1"/>
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="#2196f3" stroke="#fff" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round"
+                        style="background: #fff; border-radius: 50%; padding: 4px; box-shadow: 0 2px 6px #0002; cursor: pointer;">
+                        <circle cx="12" cy="12" r="12" fill="#fff" />
+                        <path d="M12.5 6.5l5 5-8 8H4.5v-4.5z" />
+                        <path d="M15.5 9.5l-1-1" />
                     </svg>
                 </label>
                 <input type="file" id="profileImgInput" accept="image/*" style="display:none" />
@@ -24,13 +28,17 @@
         </div>
     </header>
     <div class="container">
+        <div id="successMessage" class="success-msg" style="display:none;">Profile successfully updated!</div>
         <section>
             <h2>About Me
-                <button id="aboutMeEditBtn" class="aboutme-pen" title="Edit About Me" style="background:none;border:none;cursor:pointer;vertical-align:middle;">
-                    <svg id="aboutMePenIcon" width="20" height="20" viewBox="0 0 24 24" fill="#2196f3" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="background: #fff; border-radius: 50%; padding: 2px; box-shadow: 0 2px 6px #0002;">
-                        <circle cx="12" cy="12" r="12" fill="#fff"/>
-                        <path d="M12.5 6.5l5 5-8 8H4.5v-4.5z"/>
-                        <path d="M15.5 9.5l-1-1"/>
+                <button id="aboutMeEditBtn" class="aboutme-pen" title="Edit About Me"
+                    style="background:none;border:none;cursor:pointer;vertical-align:middle;">
+                    <svg id="aboutMePenIcon" width="20" height="20" viewBox="0 0 24 24" fill="#2196f3" stroke="#fff"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        style="background: #fff; border-radius: 50%; padding: 2px; box-shadow: 0 2px 6px #0002;">
+                        <circle cx="12" cy="12" r="12" fill="#fff" />
+                        <path d="M12.5 6.5l5 5-8 8H4.5v-4.5z" />
+                        <path d="M15.5 9.5l-1-1" />
                     </svg>
                 </button>
             </h2>
@@ -59,7 +67,8 @@
             </select>
         </section>
         <div style="margin: 24px 0 0 0; text-align: left;">
-            <button id="editProfileBtn" class="btn btn-warning" style="margin-bottom: 16px;" onclick="goEdit()">Edit Skills & Work Experiences</button>
+            <button id="editProfileBtn" class="btn btn-warning" style="margin-bottom: 16px;" onclick="goEdit()">Edit
+                Skills & Work Experiences</button>
         </div>
         <section>
             <h2>Skills</h2>
@@ -73,6 +82,30 @@
         </section>
     </div>
     <style>
+        .success-msg {
+            background-color: #4caf50;
+            color: white;
+            padding: 12px 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 500;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         .location-select {
             padding: 10px 14px;
             border-radius: 8px;
@@ -82,16 +115,25 @@
             color: #333;
             transition: border-color 0.2s;
         }
+
         .location-select:focus {
             border-color: #2196f3;
             outline: none;
             background: #fff;
         }
+
         .location-select option[disabled][selected][hidden] {
             color: #aaa;
         }
-        .aboutme-pen svg { vertical-align: middle; }
-        #aboutMeEditBtn { margin-left: 8px; }
+
+        .aboutme-pen svg {
+            vertical-align: middle;
+        }
+
+        #aboutMeEditBtn {
+            margin-left: 8px;
+        }
+
         .profile-img-container {
             position: relative;
             width: 120px;
@@ -101,6 +143,7 @@
             align-items: center;
             justify-content: center;
         }
+
         .profile-img {
             width: 120px;
             height: 120px;
@@ -109,6 +152,7 @@
             display: none;
             background: #ccc;
         }
+
         .profile-img-placeholder {
             position: absolute;
             width: 120px;
@@ -122,6 +166,7 @@
             font-size: 18px;
             z-index: 1;
         }
+
         .profile-img-pen {
             position: absolute;
             bottom: 0;
@@ -132,4 +177,5 @@
     </style>
     <script src="JobSeekProfile.js"></script>
 </body>
+
 </html>
