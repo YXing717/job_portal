@@ -280,6 +280,9 @@ function addExperience() {
     if (!expObj.jobTitle || !expObj.company || !expObj.startDate || (!isPresent && !expObj.endDate)) {
         return showMessage('Missing fields', 'error', 'exp-message');
     }
+    if (!isPresent && expObj.startDate > expObj.endDate) {
+        return showMessage('Start date must be before end date', 'error', 'exp-message');
+    }
     if (editingExp >= 0) {
         stagedData.workExperiences[editingExp] = expObj;
         editingExp = -1;
