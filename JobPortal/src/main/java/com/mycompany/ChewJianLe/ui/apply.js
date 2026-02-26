@@ -2,75 +2,82 @@
 // Mock Jobs
 // ------------------------
 const jobs = [
-  {id:1,title:"Software Engineer",location:"Kuala Lumpur",salary:9000},
-  {id:2,title:"QA Engineer",location:"Ipoh",salary:6800},
-  {id:3,title:"Data Scientist",location:"Cyberjaya",salary:7800}
+  { id: 1, title: "Software Engineer", location: "Kuala Lumpur", salary: 9000 },
+  { id: 2, title: "Frontend Developer", location: "Penang", salary: 7500 },
+  { id: 3, title: "Backend Developer", location: "Johor", salary: 8000 }
 ];
 
 // ------------------------
-// Get stored data
+// Store applied jobs globally
 // ------------------------
 let applications = JSON.parse(localStorage.getItem('applications')) || [];
 
 // ------------------------
-// Detect current page
-// ------------------------
-document.addEventListener("DOMContentLoaded", () => {
-  if(document.getElementById("results")) {
-    renderJobs();
-  }
-
-  if(document.getElementById("employerView")) {
-    renderEmployer();
-  }
-});
-
-// ------------------------
-// PROFILE PAGE
+// Profile saving function
 // ------------------------
 function saveProfile() {
   const profile = {
-    name: document.getElementById('name').value.trim(),
-    email: document.getElementById('email').value.trim(),
-    skills: document.getElementById('skills').value
-            .split(',')
-            .map(s => s.trim())
-            .filter(s => s),
-    experience: parseInt(document.getElementById('experience').value)
+    name: document.getElementById('name')?.value.trim(),
+    email: document.getElementById('email')?.value.trim(),
+    skills: document.getElementById('skills')?.value
+      .split(',')
+      .map(s => s.trim())
+      .filter(s => s),
+    experience: parseInt(document.getElementById('experience')?.value)
   };
+
+  if (!profile.name || !profile.email) {
+    showMessage("Please fill in required fields.", "error");
+    return;
+  }
 
   localStorage.setItem('profile', JSON.stringify(profile));
   showMessage("Profile saved successfully!", "success");
 }
 
 // ------------------------
-// JOB PAGE
+// Render jobs
+// ------------------------
+// ------------------------
+// Render jobs
 // ------------------------
 function renderJobs() {
   const results = document.getElementById('results');
-  if(!results) return;
+  if (!results) return;
 
   results.innerHTML = '';
 
-  jobs.forEach(job => {
+  const profile = JSON.parse(localStorage.getItem('profile'));
 
-    const alreadyApplied = applications.some(a => a.jobId === job.id);
+  jobs.forEach(job => {
+    const alreadyApplied = profile &&
+      applications.some(a => a.jobId === job.id && a.email === profile.email);
 
     const div = document.createElement('div');
     div.className = 'job-card';
 
-   div.innerHTML = `
-  <div>
-    <b>${job.title}</b><br>
-    ${job.location} &bull; RM${job.salary}
-  </div>
-  <button ${alreadyApplied ? "disabled" : ""}>
-    ${alreadyApplied ? "Applied" : "Apply Now"}
-  </button>
-`;
+    div.innerHTML = `
+      <div>
+        <b>${job.title}</b><br>
+        ${job.location} &bull; RM${job.salary}
+      </div>
+      <button class="apply-btn" ${alreadyApplied ? "disabled" : ""}>
+        ${alreadyApplied ? "Applied" : "Apply Now"}
+      </button>
+    `;
 
-    const btn = div.querySelector("button");
-    btn.onclick = () => applyJob(job);
+    const applyBtn = div.querySelector(".apply-btn");
+
+    // Unified handling
+    applyBtn.onclick = () => {
+      if (alreadyApplied) {
+        showMessage("You have already applied for this job.", "error");
+        applyBtn.disabled = true; // ensure button stays disabled
+        applyBtn.textContent = "Applied";
+        return;
+      }
+      applyJob(job);
+    };
 
     results.appendChild(div);
   });
@@ -78,24 +85,24 @@ function renderJobs() {
   renderDashboard();
 }
 
+// ------------------------
+// Apply job
+// ------------------------
 function applyJob(job) {
   const profile = JSON.parse(localStorage.getItem('profile'));
-
-  // Scenario 2
-  if(!profile || !profile.name || !profile.email || !profile.skills?.length || !profile.experience){
+  if (!profile || !profile.name || !profile.email || !profile.skills?.length || !profile.experience) {
     showMessage("Please complete your profile before applying.", "error");
     return;
   }
 
-  // Scenario 3
-  if(applications.some(a => a.jobId === job.id && a.email === profile.email)){
+  // Check for duplicates just in case
+  if (applications.some(a => a.jobId === job.id && a.email === profile.email)) {
     showMessage("You have already applied for this job.", "error");
+    renderJobs(); // re-render to ensure button stays disabled
     return;
   }
 
-  // Scenario 6 (simulate error)
-  const simulatedError = Math.random() < 0.1;
-  const status = simulatedError ? "Pending Review" : "Submitted";
+  const status = Math.random() < 0.1 ? "Pending Review" : "Submitted";
 
   const newApp = {
     jobId: job.id,
@@ -109,52 +116,85 @@ function applyJob(job) {
   localStorage.setItem("applications", JSON.stringify(applications));
 
   showMessage(
-    simulatedError
+    status === "Pending Review"
       ? "System error occurred. Saved as Pending Review."
       : "Application submitted successfully!",
-    simulatedError ? "error" : "success"
+    status === "Pending Review" ? "error" : "success"
   );
 
+  renderJobs(); // Re-render to disable the button immediately
+}
+
+// ------------------------
+// Unapply job
+// ------------------------
+function unapplyJob(jobId) {
+  const profile = JSON.parse(localStorage.getItem('profile'));
+  applications = applications.filter(app => !(app.jobId === jobId && app.email === profile.email));
+  localStorage.setItem("applications", JSON.stringify(applications));
+  showMessage("Application withdrawn successfully.", "success");
   renderJobs();
 }
 
-function renderDashboard(){
+// ------------------------
+// Render applicant dashboard
+// ------------------------
+function renderDashboard() {
   const list = document.getElementById("appliedJobs");
-  if(!list) return;
+  if (!list) return;
 
   list.innerHTML = '';
 
-  applications.forEach(app => {
-    const li = document.createElement("li");
-    li.textContent = `${app.title} - ${app.status}`;
-    list.appendChild(li);
-  });
+  const profile = JSON.parse(localStorage.getItem('profile'));
+  if (!profile) return;
+
+  applications
+    .filter(app => app.email === profile.email)
+    .forEach(app => {
+      const li = document.createElement("li");
+      li.style.display = "flex";
+      li.style.justifyContent = "space-between";
+      li.style.alignItems = "center";
+      li.style.marginBottom = "5px";
+
+      const span = document.createElement("span");
+      span.textContent = `${app.title} - ${app.status}`;
+      li.appendChild(span);
+
+      const btn = document.createElement("button");
+      btn.textContent = "Unapply";
+      btn.onclick = () => unapplyJob(app.jobId);
+      li.appendChild(btn);
+
+      list.appendChild(li);
+    });
 }
 
 // ------------------------
-// EMPLOYER PAGE
+// Render employer view
 // ------------------------
-function renderEmployer(){
+function renderEmployer() {
   const container = document.getElementById("employerView");
-  if(!container) return;
+  if (!container) return;
 
   container.innerHTML = '';
 
+  // Group applications by jobId
   const grouped = {};
-
   applications.forEach(app => {
-    if(!grouped[app.jobId]){
-      grouped[app.jobId] = [];
-    }
+    if (!grouped[app.jobId]) grouped[app.jobId] = [];
     grouped[app.jobId].push(app);
   });
 
-  for(let jobId in grouped){
+  for (let jobId in grouped) {
+    // Find job title from the jobs array
+    const job = jobs.find(j => j.id == jobId);
+    const jobTitle = job ? job.title : "Unknown Job";
+
     const section = document.createElement("div");
-    section.innerHTML = `<h3>Job ID ${jobId}</h3>`;
+    section.innerHTML = `<h3>Job ID ${jobId} - ${jobTitle}</h3>`;
 
     const ul = document.createElement("ul");
-
     grouped[jobId].forEach(app => {
       const li = document.createElement("li");
       li.textContent = `${app.name} - ${app.status}`;
@@ -165,14 +205,20 @@ function renderEmployer(){
     container.appendChild(section);
   }
 }
-
 // ------------------------
-// Message
+// Message display
 // ------------------------
-function showMessage(msg, type){
+function showMessage(msg, type) {
   const message = document.getElementById("message");
-  if(!message) return;
-
+  if (!message) return;
   message.textContent = msg;
   message.className = type;
 }
+
+// ------------------------
+// Initialize
+// ------------------------
+document.addEventListener("DOMContentLoaded", () => {
+  if (document.getElementById("results")) renderJobs();
+  if (document.getElementById("employerView")) renderEmployer();
+});
