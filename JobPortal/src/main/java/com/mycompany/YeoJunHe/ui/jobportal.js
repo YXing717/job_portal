@@ -105,11 +105,60 @@ function sanitizeInput(str){
             .trim();
 }
 
+// helpers to create richer descriptions
+function getSkillsForTitle(title){
+  const mapping = {
+    'software engineer': ['JavaScript/Java', 'REST APIs', 'SQL', 'version control'],
+    'senior software engineer': ['architecture design', 'mentoring', 'performance tuning'],
+    'engineering manager': ['team leadership', 'project management', 'stakeholder communication'],
+    'mechanical engineer': ['CAD', 'mechanical design', 'manufacturing processes'],
+    'civil engineer': ['structural analysis', 'AutoCAD', 'site supervision'],
+    'qa engineer': ['test automation', 'Selenium', 'bug tracking'],
+    'data scientist': ['Python/R', 'machine learning', 'statistics'],
+    'frontend developer': ['HTML/CSS', 'React/Vue', 'responsive design'],
+    'product manager': ['roadmapping', 'user research', 'agile methodologies'],
+    'ux designer': ['user-centered design', 'prototyping', 'Figma'],
+    'devops engineer': ['CI/CD', 'Docker/Kubernetes', 'cloud platforms'],
+    'backend engineer': ['database design', 'API development', 'server-side languages'],
+    'fullstack engineer': ['frontend frameworks', 'backend APIs', 'databases'],
+    'mobile developer': ['iOS/Android SDKs', 'react native/flutter', 'mobile UI/UX'],
+    'network engineer': ['routing/switching', 'firewalls', 'network security'],
+    'security analyst': ['vulnerability assessment', 'SIEM', 'incident response'],
+    // default fallback
+  };
+  const key = title.toLowerCase();
+  return mapping[key] || ['relevant skills in the field'];
+}
+
+function getBenefits(){
+  return ['health insurance','EPF/CPF contributions','performance bonus','flexible hours','remote work options'];
+}
+
+function getCompanyBackground(location){
+  // simple placeholder background; could be made more advanced
+  return `A leading organisation headquartered in ${location} with a dynamic work culture.`;
+}
+
 // generate description text for a job object if not already present
 function buildDescription(job){
-  // simple generic description based on title and location
-  const words = job.title.split(' ').map(w => w.toLowerCase());
-  return `The ${job.title} role in ${job.location} requires experience with ${words.join(', ')} and related skills.`;
+  const title = job.title;
+  const loc = job.location;
+  const baseSalary = job.salary;
+  const lower = Math.round(baseSalary * 0.9);
+  const upper = Math.round(baseSalary * 1.1);
+  const salaryRange = `RM${lower.toLocaleString()} - RM${upper.toLocaleString()}`;
+  const skills = getSkillsForTitle(title).join(', ');
+  const benefits = getBenefits().join(', ');
+  const companyBg = getCompanyBackground(loc);
+
+  return `${companyBg}\n\n` +
+         `**Position:** ${title} (${loc})\n` +
+         `**Salary Range:** ${salaryRange}\n\n` +
+         `**About the Role:**\n` +
+         `We are seeking a ${title} to join our team in ${loc}. The ideal candidate will be responsible for day-to-day tasks related to the role, collaborate with cross-functional teams, and contribute to ongoing projects. This position offers growth opportunities within the company.\n\n` +
+         `**Required Skills:** ${skills}.\n\n` +
+         `**Benefits:** ${benefits}.\n\n` +
+         `**Why Join Us:** Our company prides itself on innovation, employee development and a supportive environment. If you're looking for a challenging yet rewarding career, this is the place to be.`;
 }
 // ensure every job has a description property
 JOBS.forEach(j => { if(!j.description) j.description = buildDescription(j); });
@@ -123,7 +172,11 @@ const modalClose = document.getElementById('modalClose');
 function openModal(job){
   modalTitle.textContent = job.title;
   modalMeta.textContent = `${job.location} • RM${job.salary.toLocaleString()}`;
-  modalDescription.textContent = job.description;
+  // convert newlines to <br> and simple markdown bold
+  const html = job.description
+                .replace(/\n/g,'<br>')
+                .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
+  modalDescription.innerHTML = html;
   modal.style.display = 'flex';
   modal.setAttribute('aria-hidden','false');
 }
