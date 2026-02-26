@@ -26,6 +26,15 @@ function loadProfile() {
     renderExperiences();
     updateSkillButton();
     updateExpButton();
+    setDateRestrictions();
+}
+
+function setDateRestrictions() {
+    const today = new Date().toISOString().split('T')[0];
+    const startInput = document.getElementById('start');
+    const endInput = document.getElementById('end');
+    if (startInput) startInput.max = today;
+    if (endInput) endInput.max = today;
 }
 
 function saveProfile() {
@@ -191,7 +200,8 @@ function renderExperiences() {
     stagedData.workExperiences.forEach((exp, idx) => {
         const cls = idx === editingExp ? ' class="editing"' : '';
         list.innerHTML += `<li${cls}>
-            ${exp.jobTitle} at ${exp.company} (${exp.startDate} - ${exp.endDate})<br>${exp.description}
+            <strong>${exp.jobTitle}</strong> at ${exp.company} (${exp.jobType || 'Full-time'})<br>
+            ${exp.startDate} - ${exp.endDate}<br>${exp.description}
             <span>
                 <button onclick="startExpEdit(${idx})">Edit</button>
                 <button onclick="removeExperience(${idx})">Remove</button>
@@ -224,6 +234,7 @@ function startExpEdit(idx) {
     const exp = stagedData.workExperiences[idx];
     document.getElementById('title').value = exp.jobTitle;
     document.getElementById('company').value = exp.company;
+    document.getElementById('job-type').value = exp.jobType || 'Full-time';
     document.getElementById('start').value = exp.startDate;
 
     if (exp.endDate === 'Present') {
@@ -262,17 +273,42 @@ function toggleEndPicker() {
 function clearExperienceForm() {
     document.getElementById('title').value = '';
     document.getElementById('company').value = '';
+    document.getElementById('job-type').value = 'Full-time';
     document.getElementById('start').value = '';
     document.getElementById('end').value = '';
     document.getElementById('end').disabled = false;
     document.getElementById('until-present').checked = false;
     document.getElementById('desc').value = '';
 }
+
+function checkOverlaps(newExp, excludeIdx = -1) {
+    if (newExp.jobType !== 'Full-time') return null;
+
+    const parseDate = (d) => d === 'Present' ? new Date() : new Date(d);
+    const newStart = parseDate(newExp.startDate);
+    const newEnd = parseDate(newExp.endDate);
+
+    for (let i = 0; i < stagedData.workExperiences.length; i++) {
+        if (i === excludeIdx) continue;
+        const exp = stagedData.workExperiences[i];
+        if (exp.jobType !== 'Full-time') continue;
+
+        const start = parseDate(exp.startDate);
+        const end = parseDate(exp.endDate);
+
+        // Check if [newStart, newEnd] overlaps with [start, end]
+        if (newStart <= end && start <= newEnd) {
+            return { index: i, experience: exp };
+        }
+    }
+    return null;
+}
 function addExperience() {
     const isPresent = document.getElementById('until-present').checked;
     const expObj = {
         jobTitle: document.getElementById('title').value.trim(),
         company: document.getElementById('company').value.trim(),
+        jobType: document.getElementById('job-type').value,
         startDate: document.getElementById('start').value.trim(),
         endDate: isPresent ? 'Present' : document.getElementById('end').value.trim(),
         description: document.getElementById('desc').value.trim()
@@ -280,8 +316,20 @@ function addExperience() {
     if (!expObj.jobTitle || !expObj.company || !expObj.startDate || (!isPresent && !expObj.endDate)) {
         return showMessage('Missing fields', 'error', 'exp-message');
     }
+
+    const today = new Date().toISOString().split('T')[0];
+    if (expObj.startDate > today || (!isPresent && expObj.endDate > today)) {
+        return showMessage('Dates cannot be in the future', 'error', 'exp-message');
+    }
+
     if (!isPresent && expObj.startDate > expObj.endDate) {
         return showMessage('Start date must be before end date', 'error', 'exp-message');
+    }
+
+    const overlap = checkOverlaps(expObj, editingExp);
+    if (overlap) {
+        const msg = `Conflict with "${overlap.experience.jobTitle}" at ${overlap.experience.company}. Each duration can only have one Full-time job. Please change one to Part-time.`;
+        return showMessage(msg, 'error', 'exp-message');
     }
     if (editingExp >= 0) {
         stagedData.workExperiences[editingExp] = expObj;

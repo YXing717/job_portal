@@ -26,7 +26,7 @@ function loadViewProfile() {
             noExpMsg.style.display = 'none';
             data.workExperiences.forEach(exp => {
                 const li = document.createElement('li');
-                li.innerHTML = `${exp.jobTitle} at ${exp.company} (${exp.startDate} - ${exp.endDate})<br>${exp.description}`;
+                li.innerHTML = `<strong>${exp.jobTitle}</strong> at ${exp.company} (${exp.jobType || 'Full-time'})<br>${exp.startDate} - ${exp.endDate}<br>${exp.description}`;
                 expEl.appendChild(li);
             });
         } else {
