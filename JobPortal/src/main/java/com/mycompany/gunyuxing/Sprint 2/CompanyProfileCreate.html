@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Company Profile - Job Portal</title>
+    <link rel="stylesheet" href="CompanyProfileCreate.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <h1 id="page-title">Create Company Profile</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <div id="form-view">
+            <div id="error-message-container" class="error-msg" style="display:none;"></div>
+            
+            <form id="company-profile-form" novalidate>
+                <!-- Section 1: Basic Information -->
+                <section>
+                    <h2><i class="fas fa-info-circle"></i> Basic Information</h2>
+                    <div class="form-group">
+                        <label for="company-name">Company Name *</label>
+                        <input type="text" id="company-name" name="company-name" placeholder="Enter company name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-number">Registration Number *</label>
+                        <input type="text" id="reg-number" name="reg-number" placeholder="Enter BRN (e.g., 202401012345)" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Company Description * (Max 500 chars)</label>
+                        <textarea id="description" name="description" rows="5" maxlength="500" placeholder="Provide a brief overview of your company" required></textarea>
+                        <div class="char-count"><span id="char-current">0</span>/500</div>
+                    </div>
+                </section>
+
+                <!-- Section 2: Branding & Web -->
+                <section>
+                    <h2><i class="fas fa-branding"></i> Branding & Online Presence</h2>
+                    <div class="form-group">
+                        <label>Company Logo *</label>
+                        <div class="logo-upload-container">
+                            <div id="logo-preview-box" class="logo-preview">
+                                <i class="fas fa-building" id="placeholder-icon"></i>
+                                <img id="logo-preview-img" src="" alt="logo preview" style="display:none;">
+                            </div>
+                            <div class="upload-controls">
+                                <label for="logo-upload" class="btn btn-secondary">Choose File</label>
+                                <input type="file" id="logo-upload" name="logo-upload" accept="image/*" style="display:none;" required>
+                                <p class="helper-text">Accepts JPG, PNG, GIF. Max 2MB.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="company-email">Company Registered Email *</label>
+                        <input type="email" id="company-email" name="company-email" placeholder="e.g., info@company.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="website">Website (Optional)</label>
+                        <input type="url" id="website" name="website" placeholder="https://www.company.com">
+                    </div>
+                </section>
+
+                <!-- Section 3: Industry & Operations -->
+                <section>
+                    <h2><i class="fas fa-briefcase"></i> Industry & Operations</h2>
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label for="location">Location (State) *</label>
+                            <select id="location" name="location" required>
+                                <option value="" disabled selected>Select state</option>
+                                <option value="Johor">Johor</option>
+                                <option value="Kedah">Kedah</option>
+                                <option value="Kelantan">Kelantan</option>
+                                <option value="Melaka">Melaka</option>
+                                <option value="Negeri Sembilan">Negeri Sembilan</option>
+                                <option value="Pahang">Pahang</option>
+                                <option value="Penang">Penang</option>
+                                <option value="Perak">Perak</option>
+                                <option value="Perlis">Perlis</option>
+                                <option value="Sabah">Sabah</option>
+                                <option value="Sarawak">Sarawak</option>
+                                <option value="Selangor">Selangor</option>
+                                <option value="Terengganu">Terengganu</option>
+                                <option value="Kuala Lumpur">Kuala Lumpur</option>
+                                <option value="Labuan">Labuan</option>
+                                <option value="Putrajaya">Putrajaya</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="industry">Industry *</label>
+                            <input type="text" id="industry" name="industry" placeholder="e.g., Technology, Manufacturing" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="service-focus">Service/Project Focus</label>
+                        <input type="text" id="service-focus" name="service-focus" placeholder="e.g., Software Development, UI/UX Design">
+                    </div>
+                    <div class="form-group">
+                        <label for="hiring-preference">Hiring Preference</label>
+                        <select id="hiring-preference" name="hiring-preference">
+                            <option value="Full-time">Full-time</option>
+                            <option value="Contract">Contract</option>
+                            <option value="Freelance">Freelance</option>
+                            <option value="Any">Any</option>
+                        </select>
+                    </div>
+                </section>
+
+                <!-- Section 4: Budget & Legal -->
+                <section>
+                    <h2><i class="fas fa-coins"></i> Budget & Legal</h2>
+                    <div class="form-group">
+                        <label for="payment-budget">Payment & Budget range</label>
+                        <input type="text" id="payment-budget" name="payment-budget" placeholder="e.g., RM5,000 - RM10,000 per project">
+                    </div>
+                    <div class="form-group">
+                        <label for="legality">Legality Documents (Optional)</label>
+                        <input type="text" id="legality" name="legality" placeholder="Provide link or mention registration status">
+                    </div>
+                </section>
+
+                <!-- Section 5: Contact & Portfolio -->
+                <section>
+                    <h2><i class="fas fa-address-book"></i> Contact & Portfolio</h2>
+                    <div class="form-group">
+                        <label for="contact-detail">Contact Detail for Freelancers *</label>
+                        <textarea id="contact-detail" name="contact-detail" rows="3" placeholder="How should freelancers reach out to you?" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="portfolio">Portfolio (Link)</label>
+                        <input type="url" id="portfolio" name="portfolio" placeholder="https://portfolio.company.com">
+                    </div>
+                </section>
+
+                <div class="form-actions">
+                    <button type="submit" id="save-btn" class="btn btn-primary">Save Profile</button>
+                    <button type="reset" class="btn btn-warning">Reset</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- View Mode (Hidden by default) -->
+        <div id="profile-view" style="display:none;">
+            <div id="success-banner" class="success-msg">Profile successfully created!</div>
+            <div class="profile-card">
+                <div class="profile-header-view">
+                    <img id="view-logo" src="" alt="Company Logo" class="view-logo">
+                    <div class="profile-title">
+                        <h2 id="view-name"></h2>
+                        <p id="view-industry" class="tag"></p>
+                    </div>
+                </div>
+                <hr>
+                <div class="profile-details-grid">
+                    <div class="detail-item">
+                        <strong><i class="fas fa-id-card"></i> Reg No:</strong>
+                        <span id="view-reg"></span>
+                    </div>
+                    <div class="detail-item">
+                        <strong><i class="fas fa-envelope"></i> Email:</strong>
+                        <span id="view-email"></span>
+                    </div>
+                    <div class="detail-item">
+                        <strong><i class="fas fa-map-marker-alt"></i> Location:</strong>
+                        <span id="view-location"></span>
+                    </div>
+                    <div class="detail-item">
+                        <strong><i class="fas fa-globe"></i> Website:</strong>
+                        <a id="view-website" href="#" target="_blank"></a>
+                    </div>
+                </div>
+                <div class="detail-section">
+                    <h3>Description</h3>
+                    <p id="view-description"></p>
+                </div>
+                <div class="detail-section">
+                    <h3>Hiring & Budget</h3>
+                    <p><strong>Preference:</strong> <span id="view-hiring"></span></p>
+                    <p><strong>Budget:</strong> <span id="view-budget"></span></p>
+                </div>
+                <div class="detail-section">
+                    <h3>Contact Information</h3>
+                    <p id="view-contact"></p>
+                </div>
+                <div class="detail-section" id="view-legality-section">
+                    <h3>Legality</h3>
+                    <p id="view-legality"></p>
+                </div>
+                <div class="form-actions">
+                    <button onclick="window.location.reload()" class="btn btn-secondary">Create Another</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="CompanyProfileCreate.js"></script>
+</body>
+</html>
