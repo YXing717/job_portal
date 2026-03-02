@@ -124,7 +124,27 @@ public class JobPortal extends JFrame{
         JobPost job = (JobPost) jobList.getSelectedItem();
         
         if (job != null) {
-            job.setJobTitle(jobTitleField.getText());
+          // required field validation
+            if (jobTitleField.getText().trim().isEmpty()
+                    || jobCompanyField.getText().trim().isEmpty()
+                    || jobLocationField.getText().trim().isEmpty()
+                    || jobDescriptionArea.getText().trim().isEmpty()
+                    || jobSalaryField.getText().trim().isEmpty()) {
+
+                JOptionPane.showMessageDialog(this, "All fields are required.");
+                return;
+            }
+
+            // salary validation
+            double salary;
+            try {
+                salary = Double.parseDouble(jobSalaryField.getText());
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(this, "Salary must be a valid number.");
+                return;
+            }  
+          
+          job.setJobTitle(jobTitleField.getText());
             job.setJobCompany(jobCompanyField.getText());
             job.setJobLocation(jobLocationField.getText());
             job.setJobDescription(jobDescriptionArea.getText());
