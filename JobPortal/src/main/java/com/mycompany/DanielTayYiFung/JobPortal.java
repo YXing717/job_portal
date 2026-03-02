@@ -1,5 +1,26 @@
 package com.mycompany.job_portal;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+
+import java.awt.BorderLayout;
+import java.awt.GridLayout;
+
 public class JobPortal extends JFrame{
   private JComboBox<JobPost> jobList;
   private JTextField jobTitleField;
