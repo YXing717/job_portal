@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,9 +8,12 @@
     <link rel="stylesheet" href="CompanyProfileCreate.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
+
 <body>
     <header>
         <div class="header-container">
+            <button class="btn btn-icon-only" onclick="location.href='CompanyAccount.html'"><i
+                    class="fas fa-arrow-left"></i></button>
             <h1 id="page-title">Create Company Profile</h1>
         </div>
     </header>
@@ -17,22 +21,25 @@
     <div class="container">
         <div id="form-view">
             <div id="error-message-container" class="error-msg" style="display:none;"></div>
-            
+
             <form id="company-profile-form" novalidate>
                 <!-- Section 1: Basic Information -->
                 <section>
                     <h2><i class="fas fa-info-circle"></i> Basic Information</h2>
                     <div class="form-group">
                         <label for="company-name">Company Name *</label>
-                        <input type="text" id="company-name" name="company-name" placeholder="Enter company name" required>
+                        <input type="text" id="company-name" name="company-name" placeholder="Enter company name"
+                            required>
                     </div>
                     <div class="form-group">
                         <label for="reg-number">Registration Number *</label>
-                        <input type="text" id="reg-number" name="reg-number" placeholder="Enter BRN (e.g., 202401012345)" required>
+                        <input type="text" id="reg-number" name="reg-number"
+                            placeholder="Enter BRN (e.g., 202401012345)" required>
                     </div>
                     <div class="form-group">
                         <label for="description">Company Description * (Max 500 chars)</label>
-                        <textarea id="description" name="description" rows="5" maxlength="500" placeholder="Provide a brief overview of your company" required></textarea>
+                        <textarea id="description" name="description" rows="5" maxlength="500"
+                            placeholder="Provide a brief overview of your company" required></textarea>
                         <div class="char-count"><span id="char-current">0</span>/500</div>
                     </div>
                 </section>
@@ -49,14 +56,16 @@
                             </div>
                             <div class="upload-controls">
                                 <label for="logo-upload" class="btn btn-secondary">Choose File</label>
-                                <input type="file" id="logo-upload" name="logo-upload" accept="image/*" style="display:none;" required>
+                                <input type="file" id="logo-upload" name="logo-upload" accept="image/*"
+                                    style="display:none;" required>
                                 <p class="helper-text">Accepts JPG, PNG, GIF. Max 2MB.</p>
                             </div>
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="company-email">Company Registered Email *</label>
-                        <input type="email" id="company-email" name="company-email" placeholder="e.g., info@company.com" required>
+                        <input type="email" id="company-email" name="company-email" placeholder="e.g., info@company.com"
+                            required>
                     </div>
                     <div class="form-group">
                         <label for="website">Website (Optional)</label>
@@ -92,12 +101,14 @@
                         </div>
                         <div class="form-group">
                             <label for="industry">Industry *</label>
-                            <input type="text" id="industry" name="industry" placeholder="e.g., Technology, Manufacturing" required>
+                            <input type="text" id="industry" name="industry"
+                                placeholder="e.g., Technology, Manufacturing" required>
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="service-focus">Service/Project Focus</label>
-                        <input type="text" id="service-focus" name="service-focus" placeholder="e.g., Software Development, UI/UX Design">
+                        <input type="text" id="service-focus" name="service-focus"
+                            placeholder="e.g., Software Development, UI/UX Design">
                     </div>
                     <div class="form-group">
                         <label for="hiring-preference">Hiring Preference</label>
@@ -115,11 +126,13 @@
                     <h2><i class="fas fa-coins"></i> Budget & Legal</h2>
                     <div class="form-group">
                         <label for="payment-budget">Payment & Budget range</label>
-                        <input type="text" id="payment-budget" name="payment-budget" placeholder="e.g., RM5,000 - RM10,000 per project">
+                        <input type="text" id="payment-budget" name="payment-budget"
+                            placeholder="e.g., RM5,000 - RM10,000 per project">
                     </div>
                     <div class="form-group">
                         <label for="legality">Legality Documents (Optional)</label>
-                        <input type="text" id="legality" name="legality" placeholder="Provide link or mention registration status">
+                        <input type="text" id="legality" name="legality"
+                            placeholder="Provide link or mention registration status">
                     </div>
                 </section>
 
@@ -128,7 +141,8 @@
                     <h2><i class="fas fa-address-book"></i> Contact & Portfolio</h2>
                     <div class="form-group">
                         <label for="contact-detail">Contact Detail for Freelancers *</label>
-                        <textarea id="contact-detail" name="contact-detail" rows="3" placeholder="How should freelancers reach out to you?" required></textarea>
+                        <textarea id="contact-detail" name="contact-detail" rows="3"
+                            placeholder="How should freelancers reach out to you?" required></textarea>
                     </div>
                     <div class="form-group">
                         <label for="portfolio">Portfolio (Link)</label>
@@ -139,6 +153,8 @@
                 <div class="form-actions">
                     <button type="submit" id="save-btn" class="btn btn-primary">Save Profile</button>
                     <button type="reset" class="btn btn-warning">Reset</button>
+                    <button type="button" onclick="location.href='CompanyAccount.html'"
+                        class="btn btn-secondary">Cancel</button>
                 </div>
             </form>
         </div>
@@ -191,6 +207,7 @@
                     <p id="view-legality"></p>
                 </div>
                 <div class="form-actions">
+                    <button onclick="window.backToList()" class="btn btn-primary">Back to List</button>
                     <button onclick="window.location.reload()" class="btn btn-secondary">Create Another</button>
                 </div>
             </div>
@@ -199,4 +216,5 @@
 
     <script src="CompanyProfileCreate.js"></script>
 </body>
+
 </html>
