@@ -55,6 +55,10 @@ function renderSaved(page=1){
     left.appendChild(icon);
     left.appendChild(title);
     left.appendChild(meta);
+    if(j.tagline){
+      const tags = document.createElement('div'); tags.className='job-tags'; tags.textContent = j.tagline;
+      left.appendChild(tags);
+    }
     const right = document.createElement('div'); right.className='job-right';
 
     const removeBtn = document.createElement('button');

@@ -8,10 +8,18 @@
 </head>
 <body>
   <main class="container">
-    <header class="hero">
-      <h1>Job Portal</h1>
-      <p class="subtitle">Find your next opportunity across Malaysia – try searching or experimenting with keywords.</p>
-      <div style="margin-top:12px;"><a href="string2/profile.html" class="btn" style="font-size:14px;">View saved jobs</a></div>
+    <header class="hero header-flex">
+      <div class="header-left">
+        <h1>Job Portal</h1>
+        <p class="subtitle">Find your next opportunity across Malaysia – try searching or experimenting with keywords.</p>
+      </div>
+      <div class="header-right">
+        <button id="profileBtn" class="btn" title="View saved jobs">🔖</button>
+        <div class="avatar-wrap">
+          <img id="avatarImg" src="" alt="avatar" class="avatar"/>
+          <input type="file" id="avatarInput" accept="image/*" style="display:none;" />
+        </div>
+      </div>
     </header>
 
     <section class="search-panel">

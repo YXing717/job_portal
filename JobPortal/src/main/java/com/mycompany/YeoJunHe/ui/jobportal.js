@@ -160,8 +160,19 @@ function buildDescription(job){
          `**Benefits:** ${benefits}.\n\n` +
          `**Why Join Us:** Our company prides itself on innovation, employee development and a supportive environment. If you're looking for a challenging yet rewarding career, this is the place to be.`;
 }
-// ensure every job has a description property
-JOBS.forEach(j => { if(!j.description) j.description = buildDescription(j); });
+// augment each job with additional metadata (seats, benefits, tags)
+JOBS.forEach(j => {
+  if(!j.description) j.description = buildDescription(j);
+  // add random seat availability if not defined
+  if(typeof j.seats === 'undefined'){
+    j.seats = Math.floor(Math.random()*4)+1; // 1-4 seats
+  }
+  if(!j.benefits){
+    j.benefits = getBenefits();
+  }
+  // create a short tag string for card display
+  j.tagline = `Seats: ${j.seats} · Benefits: ${j.benefits.slice(0,3).join(', ')}`;
+});
 
 // modal helpers
 const modal = document.getElementById('detailModal');
@@ -190,7 +201,18 @@ modal.addEventListener('click', e => { if(e.target === modal) closeModal(); });
 
 // --- saved jobs helpers using localStorage --------------------------------
 function getSavedJobs(){
-  const raw = localStorage.getItem('savedJobs');
+  // attempt localStorage first
+  let raw = localStorage.getItem('savedJobs');
+  if(!raw){
+    // fallback to sessionStorage (transfer from previous page nav)
+    raw = sessionStorage.getItem('savedJobs');
+  }
+  // also support receiving from URL hash (encoded JSON)
+  if(!raw && location.hash.startsWith('#saved=')){
+    try{
+      raw = decodeURIComponent(location.hash.slice(7));
+    }catch(e){ raw = null; }
+  }
   return raw ? JSON.parse(raw) : [];
 }
 function isJobSaved(job){
@@ -200,7 +222,9 @@ function saveJob(job){
   const list = getSavedJobs();
   if(!isJobSaved(job)){
     list.push(job);
-    localStorage.setItem('savedJobs', JSON.stringify(list));
+    const str = JSON.stringify(list);
+    localStorage.setItem('savedJobs', str);
+    sessionStorage.setItem('savedJobs', str);
     showSnackbar('Job saved!');
   }
 }
@@ -209,7 +233,9 @@ function removeSavedJob(job){
   const before = list.length;
   list = list.filter(j=>!(j.title===job.title && j.location===job.location && j.salary===job.salary));
   if(list.length < before){
-    localStorage.setItem('savedJobs', JSON.stringify(list));
+    const str = JSON.stringify(list);
+    localStorage.setItem('savedJobs', str);
+    sessionStorage.setItem('savedJobs', str);
     showSnackbar('Removed from saved');
   }
 }
@@ -371,6 +397,10 @@ function renderResults(page=1){
     left.appendChild(icon);
     left.appendChild(title);
     left.appendChild(meta);
+    if(j.tagline){
+      const tags = document.createElement('div'); tags.className='job-tags'; tags.textContent = j.tagline;
+      left.appendChild(tags);
+    }
     const right = document.createElement('div'); right.className='job-right';
     // if already saved, mark with heart
     if(isJobSaved(j)){
@@ -460,6 +490,46 @@ input.addEventListener('keydown', e => {
     searchBtn.click();
   }
 });
+
+// header avatar/upload handling and profile navigation
+const avatarImg = document.getElementById('avatarImg');
+const avatarInput = document.getElementById('avatarInput');
+const profileBtn = document.getElementById('profileBtn');
+
+function loadAvatar(){
+  const data = localStorage.getItem('avatar');
+  if(data && avatarImg){ avatarImg.src = data; }
+}
+function saveAvatar(dataUrl){
+  localStorage.setItem('avatar', dataUrl);
+}
+if(avatarInput){
+  avatarInput.addEventListener('change', e => {
+    const file = e.target.files[0];
+    if(file){
+      const reader = new FileReader();
+      reader.onload = ev => {
+        const url = ev.target.result;
+        if(avatarImg) avatarImg.src = url;
+        saveAvatar(url);
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+}
+
+if(profileBtn){
+  profileBtn.addEventListener('click', () => {
+    // ensure storage is synced and also include hash data in case origins differ
+    const list = JSON.stringify(getSavedJobs());
+    sessionStorage.setItem('savedJobs', list);
+    const hash = '#saved=' + encodeURIComponent(list);
+    window.location.href = 'string2/profile.html' + hash;
+  });
+}
+
+// initial avatar load
+loadAvatar();
 
 if(pageSizeInput){
   pageSizeInput.addEventListener('change', ()=> renderResults(1));
