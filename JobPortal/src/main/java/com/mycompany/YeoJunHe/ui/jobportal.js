@@ -188,6 +188,84 @@ modalClose.addEventListener('click', closeModal);
 // optionally close when clicking outside content
 modal.addEventListener('click', e => { if(e.target === modal) closeModal(); });
 
+// --- saved jobs helpers using localStorage --------------------------------
+function getSavedJobs(){
+  const raw = localStorage.getItem('savedJobs');
+  return raw ? JSON.parse(raw) : [];
+}
+function isJobSaved(job){
+  return getSavedJobs().some(j=>j.title===job.title && j.location===job.location && j.salary===job.salary);
+}
+function saveJob(job){
+  const list = getSavedJobs();
+  if(!isJobSaved(job)){
+    list.push(job);
+    localStorage.setItem('savedJobs', JSON.stringify(list));
+    showSnackbar('Job saved!');
+  }
+}
+function removeSavedJob(job){
+  let list = getSavedJobs();
+  const before = list.length;
+  list = list.filter(j=>!(j.title===job.title && j.location===job.location && j.salary===job.salary));
+  if(list.length < before){
+    localStorage.setItem('savedJobs', JSON.stringify(list));
+    showSnackbar('Removed from saved');
+  }
+}
+
+// simple toast message at bottom
+function showSnackbar(msg){
+  let sn = document.getElementById('snackbar');
+  if(!sn){
+    sn = document.createElement('div');
+    sn.id='snackbar';
+    sn.className='snackbar';
+    document.body.appendChild(sn);
+  }
+  sn.textContent = msg;
+  sn.className = 'snackbar show';
+  setTimeout(()=>{ sn.className = 'snackbar'; }, 3000);
+}
+
+// update modal open/close to manage save button
+const modalSave = document.getElementById('modalSave');
+function openModal(job){
+  modalTitle.textContent = job.title;
+  modalMeta.textContent = `${job.location} • RM${job.salary.toLocaleString()}`;
+  const html = job.description
+                .replace(/\n/g,'<br>')
+                .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
+  modalDescription.innerHTML = html;
+  // configure save button
+  if(modalSave){
+    modalSave.style.display = 'inline-block';
+    const updateSaveText = () => {
+      if(isJobSaved(job)){
+        modalSave.textContent = 'Saved';
+        modalSave.classList.add('saved');
+      } else {
+        modalSave.textContent = 'Save';
+        modalSave.classList.remove('saved');
+      }
+    };
+    updateSaveText();
+    modalSave.onclick = e => {
+      e.stopPropagation();
+      if(isJobSaved(job)){
+        removeSavedJob(job);
+      } else {
+        saveJob(job);
+      }
+      updateSaveText();
+      // refresh listing so cards show updated icon
+      if(currentResults && currentResults.length){ renderResults(currentPage); }
+    };
+  }
+  modal.style.display = 'flex';
+  modal.setAttribute('aria-hidden','false');
+}
+
 function searchJobs(query, mode){
   const q = normalize(query);
   if(mode === 'exact') return JOBS.filter(j => normalize(j.title) === q);
@@ -293,7 +371,12 @@ function renderResults(page=1){
     left.appendChild(icon);
     left.appendChild(title);
     left.appendChild(meta);
-    const right = document.createElement('div'); right.className='job-right'; right.textContent = '';
+    const right = document.createElement('div'); right.className='job-right';
+    // if already saved, mark with heart
+    if(isJobSaved(j)){
+      const heart = document.createElement('span'); heart.textContent='❤️'; heart.title='Saved';
+      right.appendChild(heart);
+    }
     card.appendChild(left); card.appendChild(right);
     // show detail modal when clicking the card
     card.addEventListener('click', () => openModal(j));
