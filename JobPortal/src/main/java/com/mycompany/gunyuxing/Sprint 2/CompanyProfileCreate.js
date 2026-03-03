@@ -10,6 +10,17 @@ document.addEventListener('DOMContentLoaded', function () {
     const profileView = document.getElementById('profile-view');
     const pageTitle = document.getElementById('page-title');
 
+    // Profile Picture Elements
+    const profilePicBtn = document.getElementById('profile-pic-btn');
+    const profilePicUpload = document.getElementById('profile-pic-upload');
+    const profilePicPreview = document.getElementById('profile-pic-preview');
+
+    // Load Persistent Profile Picture
+    const savedProfilePic = localStorage.getItem('userProfilePic');
+    if (savedProfilePic) {
+        profilePicPreview.src = savedProfilePic;
+    }
+
     // 0. Initialize Data from LocalStorage
     let companies = JSON.parse(localStorage.getItem('companies')) || [];
     const urlParams = new URLSearchParams(window.location.search);
@@ -39,6 +50,10 @@ document.addEventListener('DOMContentLoaded', function () {
             logoPreviewImg.src = data['logo'];
             logoPreviewImg.style.display = 'block';
             placeholderIcon.style.display = 'none';
+        }
+
+        if (data['profilePic']) {
+            profilePicPreview.src = data['profilePic'];
         }
 
         // Trigger character count
@@ -87,6 +102,26 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+    // 2.1 Profile Picture Upload
+    profilePicBtn.addEventListener('click', () => profilePicUpload.click());
+
+    profilePicUpload.addEventListener('change', function () {
+        const file = this.files[0];
+        if (file) {
+            if (!file.type.startsWith('image/')) {
+                showError("Invalid file type. Please upload an image.");
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                profilePicPreview.src = e.target.result;
+                // Save to global persistence immediately
+                localStorage.setItem('userProfilePic', e.target.result);
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
     // 3. Form Submission Handling
     form.addEventListener('submit', function (e) {
         e.preventDefault();
@@ -118,12 +153,45 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (errors.length > 0) {
             showError(errors.join("<br>"));
+
+            // Highlight empty required fields
+            const requiredFields = form.querySelectorAll('[required]');
+            requiredFields.forEach(field => {
+                const isLogo = field.id === 'logo-upload';
+                const target = isLogo ? document.querySelector('.logo-upload-container') : field;
+
+                if (!field.value.trim() && (field.type !== 'file' || !field.files[0])) {
+                    target.classList.add('error-input');
+
+                    if (isLogo) {
+                        // Specific listener for logo upload
+                        const removeLogoError = () => {
+                            if (field.files[0]) {
+                                target.classList.remove('error-input');
+                                field.removeEventListener('change', removeLogoError);
+                            }
+                        };
+                        field.addEventListener('change', removeLogoError);
+                    } else {
+                        // Add listener to remove error when input changes
+                        const removeError = function () {
+                            if (this.value.trim()) {
+                                target.classList.remove('error-input');
+                                this.removeEventListener('input', removeError);
+                            }
+                        };
+                        field.addEventListener('input', removeError);
+                    }
+                }
+            });
+
             window.scrollTo({ top: 0, behavior: 'smooth' });
             return;
         }
 
-        // Include logo in data
+        // Include logo and profile pic in data
         data.logo = logoPreviewImg.src;
+        data.profilePic = localStorage.getItem('userProfilePic') || profilePicPreview.src;
 
         // 4. Save to LocalStorage and Transform Form to Profile View
         if (editId !== null) {

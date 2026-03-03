@@ -14,7 +14,13 @@
         <div class="header-container">
             <button class="btn btn-icon-only" onclick="location.href='CompanyAccount.html'"><i
                     class="fas fa-arrow-left"></i></button>
-            <h1 id="page-title">Create Company Profile</h1>
+            <h1 id="page-title" style="padding-left: 30px;">Create Company Profile</h1>
+            <div class="profile-upload-container" id="profile-pic-btn" title="Upload Profile Picture">
+                <img id="profile-pic-preview" src="https://via.placeholder.com/60" alt="Profile"
+                    class="profile-img-preview">
+                <div class="edit-overlay"><i class="fas fa-pencil-alt"></i></div>
+            </div>
+            <input type="file" id="profile-pic-upload" accept="image/*" style="display:none;">
         </div>
     </header>
 
@@ -208,7 +214,6 @@
                 </div>
                 <div class="form-actions">
                     <button onclick="window.backToList()" class="btn btn-primary">Back to List</button>
-                    <button onclick="window.location.reload()" class="btn btn-secondary">Create Another</button>
                 </div>
             </div>
         </div>
