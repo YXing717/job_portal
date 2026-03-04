@@ -494,7 +494,7 @@ input.addEventListener('keydown', e => {
 // header avatar/upload handling and profile navigation
 const avatarImg = document.getElementById('avatarImg');
 const avatarInput = document.getElementById('avatarInput');
-const avatarEditBtn = document.getElementById('avatarEditBtn');
+// edit button is now a label; no JS reference needed
 const profileBtn = document.getElementById('profileBtn');
 const savedCountBadge = document.getElementById('savedCount');
 
@@ -530,19 +530,22 @@ if(avatarInput){
     }
   });
 }
-if(avatarEditBtn){
-  avatarEditBtn.addEventListener('click', () => {
-    if(avatarInput) avatarInput.click();
-  });
-}
+// no JS needed for edit label since <label for="avatarInput"> handles click
 
 if(profileBtn){
-  profileBtn.addEventListener('click', () => {
-    // ensure storage is synced and also include hash data in case origins differ
-    const list = JSON.stringify(getSavedJobs());
-    sessionStorage.setItem('savedJobs', list);
-    const hash = '#saved=' + encodeURIComponent(list);
-    window.location.href = 'string2/profile.html' + hash;
+  profileBtn.addEventListener('click', e => {
+    // guard against default navigation so we can save data first
+    e.preventDefault();
+    try{
+      const list = JSON.stringify(getSavedJobs());
+      sessionStorage.setItem('savedJobs', list);
+      const hash = '#saved=' + encodeURIComponent(list);
+      // if JS fails later, fall back to anchor href
+      window.location.href = profileBtn.href + hash;
+    }catch(err){
+      // still navigate even if storage is unavailable
+      window.location.href = profileBtn.href;
+    }
   });
 }
 

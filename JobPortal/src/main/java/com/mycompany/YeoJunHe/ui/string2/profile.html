@@ -7,6 +7,18 @@
   <link rel="stylesheet" href="../jobportal.css">
 </head>
 <body>
+  <!-- top fixed navigation for profile and avatar -->
+  <nav class="top-nav">
+    <div class="saved-wrapper">
+      <a id="profileBtn" class="btn" title="View saved jobs" href="profile.html">🔖</a>
+      <span id="savedCount" class="badge"></span>
+    </div>
+    <div class="avatar-wrap">
+      <img id="avatarImg" src="" alt="avatar" class="avatar"/>
+      <input type="file" id="avatarInput" accept="image/*" style="display:none;" />
+      <label for="avatarInput" class="btn avatar-edit-btn" title="Change avatar">Edit</label>
+    </div>
+  </nav>
   <main class="container">
     <header class="hero header-flex">
       <div class="header-left">
@@ -18,15 +30,7 @@
         </div>
       </div>
       <div class="header-right">
-        <div class="saved-wrapper">
-          <a id="profileBtn" class="btn" title="View saved jobs" href="profile.html">🔖</a>
-          <span id="savedCount" class="badge"></span>
-        </div>
-        <div class="avatar-wrap">
-          <img id="avatarImg" src="" alt="avatar" class="avatar"/>
-          <input type="file" id="avatarInput" accept="image/*" style="display:none;" />
-          <label for="avatarInput" class="btn avatar-edit-btn" title="Change avatar">Edit</label>
-        </div>
+        <!-- moved to top-nav -->
       </div>
     </header>
 
