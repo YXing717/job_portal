@@ -8,12 +8,25 @@
 </head>
 <body>
   <main class="container">
-    <header class="hero">
-      <h1>Saved Jobs</h1>
-      <p class="subtitle">These are the positions you've bookmarked. Click to view details or remove them when you're ready.</p>
-      <div style="margin-top:12px;display:flex;gap:8px;">
-        <a href="../JobPortalPage.html" class="btn" style="font-size:14px;">Back to search</a>
-        <button id="clearAllBtn" class="btn save" style="font-size:14px;">Clear all</button>
+    <header class="hero header-flex">
+      <div class="header-left">
+        <h1>Saved Jobs</h1>
+        <p class="subtitle">These are the positions you've bookmarked. Click to view details or remove them when you're ready.</p>
+        <div style="margin-top:12px;display:flex;gap:8px;">
+          <a href="../JobPortalPage.html" class="btn" style="font-size:14px;">Back to search</a>
+          <button id="clearAllBtn" class="btn save" style="font-size:14px;">Clear all</button>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="saved-wrapper">
+          <button id="profileBtn" class="btn" title="View saved jobs">🔖</button>
+          <span id="savedCount" class="badge"></span>
+        </div>
+        <div class="avatar-wrap">
+          <img id="avatarImg" src="" alt="avatar" class="avatar"/>
+          <input type="file" id="avatarInput" accept="image/*" style="display:none;" />
+          <button id="avatarEditBtn" class="btn avatar-edit-btn" title="Change avatar">Edit</button>
+        </div>
       </div>
     </header>
 

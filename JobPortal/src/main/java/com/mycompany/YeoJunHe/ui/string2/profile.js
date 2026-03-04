@@ -8,6 +8,7 @@ function removeSavedJob(job){
   let list = getSavedJobs();
   list = list.filter(j=>!(j.title===job.title && j.location===job.location && j.salary===job.salary));
   localStorage.setItem('savedJobs', JSON.stringify(list));
+  if(typeof updateSavedCount === 'function') updateSavedCount();
   return list;
 }
 
@@ -114,6 +115,7 @@ function init(){
         currentList = [];
         renderSaved(1);
         updateBtn();
+        if(typeof updateSavedCount === 'function') updateSavedCount();
       }
     });
     updateBtn();

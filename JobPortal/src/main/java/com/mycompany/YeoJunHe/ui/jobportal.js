@@ -494,7 +494,9 @@ input.addEventListener('keydown', e => {
 // header avatar/upload handling and profile navigation
 const avatarImg = document.getElementById('avatarImg');
 const avatarInput = document.getElementById('avatarInput');
+const avatarEditBtn = document.getElementById('avatarEditBtn');
 const profileBtn = document.getElementById('profileBtn');
+const savedCountBadge = document.getElementById('savedCount');
 
 function loadAvatar(){
   const data = localStorage.getItem('avatar');
@@ -502,6 +504,17 @@ function loadAvatar(){
 }
 function saveAvatar(dataUrl){
   localStorage.setItem('avatar', dataUrl);
+}
+
+function updateSavedCount(){
+  if(!savedCountBadge) return;
+  const count = getSavedJobs().length;
+  if(count > 0){
+    savedCountBadge.textContent = count;
+    savedCountBadge.style.display = 'flex';
+  } else {
+    savedCountBadge.style.display = 'none';
+  }
 }
 if(avatarInput){
   avatarInput.addEventListener('change', e => {
@@ -517,6 +530,11 @@ if(avatarInput){
     }
   });
 }
+if(avatarEditBtn){
+  avatarEditBtn.addEventListener('click', () => {
+    if(avatarInput) avatarInput.click();
+  });
+}
 
 if(profileBtn){
   profileBtn.addEventListener('click', () => {
@@ -528,8 +546,22 @@ if(profileBtn){
   });
 }
 
+// keep badge updated when jobs change
+const origSaveJob = saveJob;
+const origRemoveSavedJob = removeSavedJob;
+saveJob = function(job){
+  origSaveJob(job);
+  updateSavedCount();
+};
+removeSavedJob = function(job){
+  origRemoveSavedJob(job);
+  updateSavedCount();
+};
+
 // initial avatar load
 loadAvatar();
+// initial count badge
+updateSavedCount();
 
 if(pageSizeInput){
   pageSizeInput.addEventListener('change', ()=> renderResults(1));

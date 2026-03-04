@@ -14,10 +14,14 @@
         <p class="subtitle">Find your next opportunity across Malaysia – try searching or experimenting with keywords.</p>
       </div>
       <div class="header-right">
-        <button id="profileBtn" class="btn" title="View saved jobs">🔖</button>
+        <div class="saved-wrapper">
+          <button id="profileBtn" class="btn" title="View saved jobs">🔖</button>
+          <span id="savedCount" class="badge"></span>
+        </div>
         <div class="avatar-wrap">
           <img id="avatarImg" src="" alt="avatar" class="avatar"/>
           <input type="file" id="avatarInput" accept="image/*" style="display:none;" />
+          <button id="avatarEditBtn" class="btn avatar-edit-btn" title="Change avatar">Edit</button>
         </div>
       </div>
     </header>
