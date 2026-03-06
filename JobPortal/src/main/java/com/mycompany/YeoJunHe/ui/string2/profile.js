@@ -1,9 +1,5 @@
 // profile.js - display saved job posts and allow removal
 
-function getSavedJobs(){
-  const raw = localStorage.getItem('savedJobs');
-  return raw ? JSON.parse(raw) : [];
-}
 function removeSavedJob(job){
   let list = getSavedJobs();
   list = list.filter(j=>!(j.title===job.title && j.location===job.location && j.salary===job.salary));

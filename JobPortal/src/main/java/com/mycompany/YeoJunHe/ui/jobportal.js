@@ -571,5 +571,5 @@ if(pageSizeInput){
 }
 
 // initial empty state
-currentResults = [];
+currentResults = JOBS;
 renderResults(1);
