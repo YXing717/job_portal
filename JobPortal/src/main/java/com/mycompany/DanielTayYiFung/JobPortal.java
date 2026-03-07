@@ -157,6 +157,49 @@ public class JobPortal extends JFrame{
         }
     }
 
+  public void addJob() {
+        if (jobTitleField.getText().trim().isEmpty()
+                || jobCompanyField.getText().trim().isEmpty()
+                || jobLocationField.getText().trim().isEmpty()
+                || jobDescriptionArea.getText().trim().isEmpty()
+                || jobSalaryField.getText().trim().isEmpty()) {
+
+            JOptionPane.showMessageDialog(this, "All fields are required.");
+            return;
+        }
+
+        double salary;
+        try {
+            salary = Double.parseDouble(jobSalaryField.getText());
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Salary must be a valid number.");
+            return;
+        }
+
+        JobPost newJob = new JobPost(
+                jobTitleField.getText(),
+                jobCompanyField.getText(),
+                jobLocationField.getText(),
+                jobDescriptionArea.getText(),
+                salary
+        );
+
+        jobs.add(newJob);
+
+        jobList.addItem(newJob);
+
+        saveJobs();
+
+        JOptionPane.showMessageDialog(this, "New job posted successfully");
+
+        // clear fields
+        jobTitleField.setText("");
+        jobCompanyField.setText("");
+        jobLocationField.setText("");
+        jobDescriptionArea.setText("");
+        jobSalaryField.setText("");
+    }
+
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> new JobPortal().setVisible(true));
     }
