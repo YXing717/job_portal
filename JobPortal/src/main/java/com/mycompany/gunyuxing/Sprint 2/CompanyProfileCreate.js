@@ -60,8 +60,7 @@ document.addEventListener('DOMContentLoaded', function () {
         description.dispatchEvent(new Event('input'));
     }
 
-    // Mock "existing" emails for uniqueness check (excluding current one if editing)
-    const existingEmails = ['admin@google.com', 'hr@test.com', 'contact@startup.io'];
+
 
     // 1. Description Character Count
     description.addEventListener('input', function () {
@@ -146,9 +145,22 @@ document.addEventListener('DOMContentLoaded', function () {
             errors.push("Company Logo is required.");
         }
 
-        // Email Uniqueness Check (Acceptance Criteria #6)
-        if (existingEmails.includes(data['company-email'].toLowerCase())) {
-            errors.push("This email address is already registered in our system.");
+        // Uniqueness Checks (Registration Number and Email)
+        const isDuplicateReg = companies.some((comp, index) => {
+            if (editId !== null && index == editId) return false;
+            return comp['reg-number'] === data['reg-number'];
+        });
+
+        const isDuplicateEmail = companies.some((comp, index) => {
+            if (editId !== null && index == editId) return false;
+            return comp['company-email'].toLowerCase() === data['company-email'].toLowerCase();
+        });
+
+        if (isDuplicateReg) {
+            errors.push("This Registration Number is already registered.");
+        }
+        if (isDuplicateEmail) {
+            errors.push("This company email is already registered.");
         }
 
         if (errors.length > 0) {
