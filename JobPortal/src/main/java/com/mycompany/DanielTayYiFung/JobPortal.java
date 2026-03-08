@@ -20,8 +20,12 @@ import javax.swing.SwingUtilities;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
+import java.awt.CardLayout;
 
 public class JobPortal extends JFrame{
+  private CardLayout cardLayout;
+    private JPanel mainPanel;
+  
   private JComboBox<JobPost> jobList;
   private JTextField jobTitleField;
   private JTextField jobCompanyField;
@@ -32,17 +36,69 @@ public class JobPortal extends JFrame{
   private ArrayList<JobPost> jobs = new ArrayList<>();
   private final String FILE_NAME = "jobs.txt";
 
+  private boolean updateMode = false;
+    private JPanel jobListPanel;
+
   public JobPortal() {
         loadJobs();
 
         setTitle("Edit Job Post");
         setSize(500, 400);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setLayout(new BorderLayout());
 
-        // Dropdown list of jobs
+    cardLayout = new CardLayout();
+        mainPanel = new JPanel(cardLayout);
+
+        mainPanel.add(createMenuPanel(), "MENU");
+        mainPanel.add(createFormPanel(), "FORM");
+
+        add(mainPanel);
+
+        cardLayout.show(mainPanel, "MENU");
+    }
+
+  private JPanel createMenuPanel() {
+
+        JPanel panel = new JPanel(new GridLayout(2, 1, 20, 20));
+
+        JButton createBtn = new JButton("Create New Job Post");
+        JButton updateBtn = new JButton("Update Existing Job Post");
+
+        createBtn.addActionListener(e -> {
+            updateMode = false;
+            clearFields();
+            
+            jobListPanel.setVisible(false);
+            cardLayout.show(mainPanel, "FORM");
+        });
+
+        updateBtn.addActionListener(e -> {
+            updateMode = true;
+
+            jobListPanel.setVisible(true);
+            
+            if (!jobs.isEmpty()) {
+                displaySelectedJob();
+            }
+
+            cardLayout.show(mainPanel, "FORM");
+        });
+
+        panel.add(createBtn);
+        panel.add(updateBtn);
+
+        return panel;
+    }
+
+  private JPanel createFormPanel() {
+
+        JPanel panel = new JPanel(new BorderLayout());
+
+        jobListPanel = new JPanel(new BorderLayout());
         jobList = new JComboBox<>(jobs.toArray(new JobPost[0]));
-        add(jobList, BorderLayout.NORTH);
+        jobListPanel.add(jobList, BorderLayout.CENTER);
+
+        panel.add(jobListPanel, BorderLayout.NORTH);
 
         JPanel form = new JPanel(new GridLayout(5, 2, 10, 10));
 
@@ -66,17 +122,43 @@ public class JobPortal extends JFrame{
         jobSalaryField = new JTextField();
         form.add(jobSalaryField);
 
-        add(form, BorderLayout.CENTER);
+        panel.add(form, BorderLayout.CENTER);
 
-        JButton updateBtn = new JButton("Update Job");
-        add(updateBtn, BorderLayout.SOUTH);
+        JPanel buttons = new JPanel();
 
-        jobList.addActionListener(e -> displaySelectedJob());
-        updateBtn.addActionListener(e -> updateJob());
+        JButton saveBtn = new JButton("Save");
+        JButton backBtn = new JButton("Back");
 
-        if (!jobs.isEmpty()) {
-            displaySelectedJob();
-        }
+        saveBtn.addActionListener(e -> {
+            if (updateMode) {
+                updateJob();
+            } else {
+                addJob();
+            }
+        });
+
+        backBtn.addActionListener(e -> cardLayout.show(mainPanel, "MENU"));
+
+        buttons.add(saveBtn);
+        buttons.add(backBtn);
+
+        panel.add(buttons, BorderLayout.SOUTH);
+
+        jobList.addActionListener(e -> {
+            if (updateMode) {
+                displaySelectedJob();
+            }
+        });
+
+        return panel;
+    }
+
+  private void clearFields() {
+        jobTitleField.setText("");
+        jobCompanyField.setText("");
+        jobLocationField.setText("");
+        jobDescriptionArea.setText("");
+        jobSalaryField.setText("");
     }
   
   private void loadJobs() {
