@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function () {
         renderCompanies(companies);
     }
 
-    function renderCompanies(companies) {
+    async function renderCompanies(companies) {
         companyList.innerHTML = '';
 
         if (companies.length === 0) {
@@ -18,13 +18,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
         noRecords.style.display = 'none';
 
-        companies.forEach((company, index) => {
+        for (const [index, company] of companies.entries()) {
             const card = document.createElement('div');
             card.className = 'company-card';
             card.onclick = () => editCompany(index);
 
-            const logoHtml = company.logo
-                ? `<img src="${company.logo}" alt="${company['company-name']}">`
+            // Fetch logo from IndexedDB
+            const logo = await ImageDB.getImage(`logo_${company['reg-number']}`);
+            const logoHtml = logo
+                ? `<img src="${logo}" alt="${company['company-name']}">`
                 : `<i class="fas fa-building"></i>`;
 
             card.innerHTML = `
@@ -37,16 +39,22 @@ document.addEventListener('DOMContentLoaded', function () {
                 <button class="btn-delete" onclick="event.stopPropagation(); deleteCompany(${index})">Delete</button>
             `;
             companyList.appendChild(card);
-        });
+        }
     }
 
     window.editCompany = function (index) {
         window.location.href = `CompanyProfileCreate.html?id=${index}`;
     };
 
-    window.deleteCompany = function (index) {
+    window.deleteCompany = async function (index) {
         if (confirm('Are you sure you want to delete this record?')) {
             let companies = JSON.parse(localStorage.getItem('companies')) || [];
+            const company = companies[index];
+            if (company) {
+                // Delete images from IndexedDB
+                await ImageDB.deleteImage(`logo_${company['reg-number']}`);
+                await ImageDB.deleteImage(`profile_${company['reg-number']}`);
+            }
             companies.splice(index, 1);
             localStorage.setItem('companies', JSON.stringify(companies));
             renderCompanies(companies);

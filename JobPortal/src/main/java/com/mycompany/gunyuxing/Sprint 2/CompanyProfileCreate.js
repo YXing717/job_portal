@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const logoUpload = document.getElementById('logo-upload');
     const logoPreviewImg = document.getElementById('logo-preview-img');
     const placeholderIcon = document.getElementById('placeholder-icon');
+    const logoError = document.getElementById('logo-error');
     const description = document.getElementById('description');
     const charCurrent = document.getElementById('char-current');
     const errorContainer = document.getElementById('error-message-container');
@@ -21,17 +22,20 @@ document.addEventListener('DOMContentLoaded', function () {
         profilePicPreview.src = savedProfilePic;
     }
 
-    // 0. Initialize Data from LocalStorage
-    let companies = JSON.parse(localStorage.getItem('companies')) || [];
+    // 0. Initialize Data
     const urlParams = new URLSearchParams(window.location.search);
     const editId = urlParams.get('id');
 
-    if (editId !== null && companies[editId]) {
-        populateForm(companies[editId]);
-        pageTitle.innerText = "Edit Company Profile";
+    async function loadInitialData() {
+        const companies = JSON.parse(localStorage.getItem('companies')) || [];
+        if (editId !== null && companies[editId]) {
+            await populateForm(companies[editId]);
+            displayProfile(companies[editId]);
+        }
     }
+    loadInitialData();
 
-    function populateForm(data) {
+    async function populateForm(data) {
         document.getElementById('company-name').value = data['company-name'];
         document.getElementById('reg-number').value = data['reg-number'];
         document.getElementById('description').value = data['description'];
@@ -46,14 +50,19 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('contact-detail').value = data['contact-detail'];
         document.getElementById('portfolio').value = data['portfolio'] || '';
 
-        if (data['logo']) {
-            logoPreviewImg.src = data['logo'];
-            logoPreviewImg.style.display = 'block';
-            placeholderIcon.style.display = 'none';
-        }
+        // Load images from IndexedDB
+        if (data['reg-number']) {
+            const logo = await ImageDB.getImage(`logo_${data['reg-number']}`);
+            if (logo) {
+                logoPreviewImg.src = logo;
+                logoPreviewImg.style.display = 'block';
+                placeholderIcon.style.display = 'none';
+            }
 
-        if (data['profilePic']) {
-            profilePicPreview.src = data['profilePic'];
+            const profilePic = await ImageDB.getImage(`profile_${data['reg-number']}`);
+            if (profilePic) {
+                profilePicPreview.src = profilePic;
+            }
         }
 
         // Trigger character count
@@ -77,18 +86,16 @@ document.addEventListener('DOMContentLoaded', function () {
     logoUpload.addEventListener('change', function () {
         const file = this.files[0];
         if (file) {
-            // Validation: File Type
-            if (!file.type.startsWith('image/')) {
-                showError("Invalid file type. Please upload an image (JPG, PNG, GIF).");
+            // Validation: File Type (Only JPG/PNG)
+            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+            if (!allowedTypes.includes(file.type)) {
+                logoError.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Invalid file type. Please upload a JPG or PNG image.`;
+                logoError.style.display = 'block';
                 this.value = '';
                 return;
             }
-            // Validation: File Size (2MB)
-            if (file.size > 2 * 1024 * 1024) {
-                showError("File is too large. Max size is 2MB.");
-                this.value = '';
-                return;
-            }
+            logoError.style.display = 'none';
+            // Validation: File Size removed as per requirement
 
             const reader = new FileReader();
             reader.onload = function (e) {
@@ -122,7 +129,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // 3. Form Submission Handling
-    form.addEventListener('submit', function (e) {
+    form.addEventListener('submit', async function (e) {
         e.preventDefault();
         errorContainer.style.display = 'none';
 
@@ -132,12 +139,28 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Field Validation
         if (!data['company-name'].trim()) errors.push("Company Name is required.");
-        if (!data['reg-number'].trim()) errors.push("Registration Number is required.");
+
+        // Registration Number: exactly 12 digits
+        const regNum = data['reg-number'].trim();
+        if (!regNum) {
+            errors.push("Registration Number is required.");
+        } else if (!/^\d{12}$/.test(regNum)) {
+            errors.push("Registration Number must be exactly 12 digits.");
+        }
+
         if (!data['description'].trim()) errors.push("Description is required.");
         if (data['description'].length > 500) errors.push("Description cannot exceed 500 characters.");
-        if (!data['company-email'].trim()) errors.push("Company Email is required.");
+
+        // Email Validation: must contain '@' and '.com'
+        const email = data['company-email'].trim();
+        if (!email) {
+            errors.push("Company Email is required.");
+        } else if (!email.includes('@') || !email.toLowerCase().endsWith('.com')) {
+            errors.push("Email must contain '@' and end with '.com'.");
+        }
+
         if (!data['location']) errors.push("Location is required.");
-        if (!data['industry'].trim()) errors.push("Industry is required.");
+        if (!data['industry']) errors.push("Industry is required.");
         if (!data['contact-detail'].trim()) errors.push("Contact Detail is required.");
 
         // Logo Validation (Manual check because required attribute doesn't show in FormData easily for files)
@@ -145,7 +168,9 @@ document.addEventListener('DOMContentLoaded', function () {
             errors.push("Company Logo is required.");
         }
 
-        // Uniqueness Checks (Registration Number and Email)
+        // Uniqueness Checks (Fetch fresh data to avoid duplication bugs)
+        const companies = JSON.parse(localStorage.getItem('companies')) || [];
+
         const isDuplicateReg = companies.some((comp, index) => {
             if (editId !== null && index == editId) return false;
             return comp['reg-number'] === data['reg-number'];
@@ -206,14 +231,28 @@ document.addEventListener('DOMContentLoaded', function () {
         data.profilePic = localStorage.getItem('userProfilePic') || profilePicPreview.src;
 
         // 4. Save to LocalStorage and Transform Form to Profile View
-        if (editId !== null) {
-            companies[editId] = data;
-        } else {
-            companies.push(data);
-        }
-        localStorage.setItem('companies', JSON.stringify(companies));
+        try {
+            // Store large images in IndexedDB instead of localStorage
+            const regNumKey = data['reg-number'];
+            await ImageDB.storeImage(`logo_${regNumKey}`, logoPreviewImg.src);
+            await ImageDB.storeImage(`profile_${regNumKey}`, profilePicPreview.src);
 
-        displayProfile(data);
+            // Remove large strings from data before saving to localStorage
+            delete data.logo;
+            delete data.profilePic;
+
+            if (editId !== null) {
+                companies[editId] = data;
+            } else {
+                companies.push(data);
+            }
+            localStorage.setItem('companies', JSON.stringify(companies));
+            displayProfile(data);
+        } catch (error) {
+            console.error("Storage error:", error);
+            showError("Failed to save profile. There might be a technical issue with browser storage.");
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
     });
 
     function showError(msg) {
@@ -221,7 +260,7 @@ document.addEventListener('DOMContentLoaded', function () {
         errorContainer.style.display = 'block';
     }
 
-    function displayProfile(data) {
+    async function displayProfile(data) {
         // Populate view fields
         document.getElementById('view-name').innerText = data['company-name'];
         document.getElementById('view-reg').innerText = data['reg-number'];
@@ -252,7 +291,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Logo handle
         const viewLogo = document.getElementById('view-logo');
-        viewLogo.src = logoPreviewImg.src;
+        const logo = await ImageDB.getImage(`logo_${data['reg-number']}`);
+        viewLogo.src = logo || logoPreviewImg.src;
 
         // Switch screens
         formView.style.display = 'none';
@@ -263,5 +303,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
     window.backToList = function () {
         window.location.href = 'CompanyAccount.html';
+    };
+
+    window.cancelCreate = function () {
+        if (confirm('Are you sure you want to cancel? Any unsaved changes will be lost.')) {
+            form.reset();
+            // Clear previews
+            logoPreviewImg.style.display = 'none';
+            placeholderIcon.style.display = 'block';
+            profilePicPreview.src = 'https://via.placeholder.com/60';
+            window.location.href = 'CompanyAccount.html';
+        }
     };
 });
