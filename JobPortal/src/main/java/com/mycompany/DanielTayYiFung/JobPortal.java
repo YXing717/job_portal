@@ -35,7 +35,7 @@ public class JobPortal extends JFrame{
   private JTextField jobSalaryField;
 
   private ArrayList<JobPost> jobs = new ArrayList<>();
-  private final String FILE_NAME = "jobs.txt";
+  private final String FILE_NAME = "jobs.csv";
 
   private boolean updateMode = false;
     private JPanel jobListPanel;
@@ -179,29 +179,54 @@ form.add(new JLabel("Category:"));
         try (BufferedReader br = new BufferedReader(new FileReader(FILE_NAME))) {
             String line;
             while ((line = br.readLine()) != null) {
-                String[] data = line.split("\\s*\\|\\s*");
+                String[] data = line.split(",");
+              
+              if (data.length < 6) {
+                    continue; // skip invalid line
+                }
+              
                 String title = data[0];
                 String company = data[1];
                 String location = data[2];
                 String description = data[3];
               String category = data[4];
-                double salary = Double.parseDouble(data[5]);
+                double salary;
+
+              try {
+                    salary = Double.parseDouble(data[5]);
+                } catch (NumberFormatException e) {
+                    continue; // skip invalid salary
+                }
 
                 jobs.add(new JobPost(title, company, location, description, category, salary));
             }
         } catch (IOException e) {
-            JOptionPane.showMessageDialog(this, "jobs.txt not found");
+            JOptionPane.showMessageDialog(this, "jobs.csv not found");
         }
     }
 
-    private void saveJobs() {
+    private boolean saveJobs() {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(FILE_NAME))) {
-            for (JobPost job : jobs) {
-                bw.write(job.toFile());
+          bw.write("Title,Company,Location,Description,Category,Salary");
+            bw.newLine();  
+          
+          for (JobPost job : jobs) {
+                bw.write(
+                  job.getJobTitle() + ","
+                        + job.getJobCompany() + ","
+                        + job.getJobLocation() + ","
+                        + job.getJobDescription() + ","
+                        + job.getJobCategory() + ","
+                        + job.getJobSalary()
+                );
                 bw.newLine();
             }
+
+          return true;
+            
         } catch (IOException e) {
             JOptionPane.showMessageDialog(this, "Error saving file");
+          return false;
         }
     }
 
@@ -250,10 +275,9 @@ form.add(new JLabel("Category:"));
           job.setJobCategory((String) jobCategoryBox.getSelectedItem());
             job.setJobSalary(Double.parseDouble(jobSalaryField.getText()));
 
-            saveJobs();
-            jobList.repaint();
-
-            JOptionPane.showMessageDialog(this, "Job updated successfully!");
+            if (saveJobs()) {
+                JOptionPane.showMessageDialog(this, "Job updated successfully!");
+            }
         }
     }
 
@@ -290,9 +314,9 @@ form.add(new JLabel("Category:"));
 
         jobList.addItem(newJob);
 
-        saveJobs();
-
-        JOptionPane.showMessageDialog(this, "New job posted successfully");
+        if (saveJobs()) {
+            JOptionPane.showMessageDialog(this, "New job posted successfully");
+        }
 
         // clear fields
         jobTitleField.setText("");
