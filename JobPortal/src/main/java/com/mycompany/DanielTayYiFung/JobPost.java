@@ -6,13 +6,15 @@ public class JobPost {
     private String jobCompany;
     private String jobDescription;
     private String jobLocation;
+    private String jobCategory;
     private double jobSalary;
 
-    public JobPost(String jobTitle, String jobCompany, String jobDescription, String jobLocation, double jobSalary) {
+    public JobPost(String jobTitle, String jobCompany, String jobDescription, String jobLocation, String jobCategory, double jobSalary) {
         this.jobTitle = jobTitle;
         this.jobCompany = jobCompany;
         this.jobDescription = jobDescription;
         this.jobLocation = jobLocation;
+        this.jobCategory = jobCategory;
         this.jobSalary = jobSalary;
     }
 
@@ -49,6 +51,14 @@ public class JobPost {
         return jobLocation;
     }
 
+    public void setJobCategory(String jobCategory) {
+        this.jobCategory = jobCategory;
+    }
+
+    public String getJobCategory() {
+        return jobCategory;
+    }
+
     public void setJobSalary(double jobSalary) {
         this.jobSalary = jobSalary;
     }
@@ -63,6 +73,6 @@ public class JobPost {
     }
 
     public String toFile() {
-        return jobTitle + " | " + jobCompany + " | " + jobLocation + " | " + jobDescription + " | " + jobSalary;
+        return jobTitle + " | " + jobCompany + " | " + jobLocation + " | " + jobDescription + " | " + jobCategory + " | " + jobSalary;
     }
 }
