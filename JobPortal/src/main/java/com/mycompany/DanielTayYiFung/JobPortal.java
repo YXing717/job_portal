@@ -31,6 +31,7 @@ public class JobPortal extends JFrame{
   private JTextField jobCompanyField;
   private JTextField jobLocationField;
   private JTextArea jobDescriptionArea;
+  private JComboBox<String> jobCategoryBox;
   private JTextField jobSalaryField;
 
   private ArrayList<JobPost> jobs = new ArrayList<>();
@@ -100,7 +101,7 @@ public class JobPortal extends JFrame{
 
         panel.add(jobListPanel, BorderLayout.NORTH);
 
-        JPanel form = new JPanel(new GridLayout(5, 2, 10, 10));
+        JPanel form = new JPanel(new GridLayout(6, 2, 10, 10));
 
         form.add(new JLabel("Job Title:"));
         jobTitleField = new JTextField();
@@ -118,6 +119,18 @@ public class JobPortal extends JFrame{
         jobDescriptionArea = new JTextArea();
         form.add(new JScrollPane(jobDescriptionArea));
 
+form.add(new JLabel("Category:"));
+        jobCategoryBox = new JComboBox<>(new String[]{
+            "Select Category",
+            "IT",
+            "Finance",
+            "Marketing",
+            "Engineering",
+            "Healthcare",
+            "Education"
+        });
+        form.add(jobCategoryBox);
+    
         form.add(new JLabel("Salary:"));
         jobSalaryField = new JTextField();
         form.add(jobSalaryField);
@@ -158,6 +171,7 @@ public class JobPortal extends JFrame{
         jobCompanyField.setText("");
         jobLocationField.setText("");
         jobDescriptionArea.setText("");
+    jobCategoryBox.setSelectedIndex(0);
         jobSalaryField.setText("");
     }
   
@@ -170,9 +184,10 @@ public class JobPortal extends JFrame{
                 String company = data[1];
                 String location = data[2];
                 String description = data[3];
-                double salary = Double.parseDouble(data[4]);
+              String category = data[4];
+                double salary = Double.parseDouble(data[5]);
 
-                jobs.add(new JobPost(title, company, location, description, salary));
+                jobs.add(new JobPost(title, company, location, description, category, salary));
             }
         } catch (IOException e) {
             JOptionPane.showMessageDialog(this, "jobs.txt not found");
@@ -198,6 +213,7 @@ public class JobPortal extends JFrame{
             jobCompanyField.setText(job.getJobCompany());
             jobLocationField.setText(job.getJobLocation());
             jobDescriptionArea.setText(job.getJobDescription());
+          jobCategoryBox.setSelectedItem(job.getJobCategory());
             jobSalaryField.setText(String.valueOf(job.getJobSalary()));
         }
     }
@@ -211,6 +227,7 @@ public class JobPortal extends JFrame{
                     || jobCompanyField.getText().trim().isEmpty()
                     || jobLocationField.getText().trim().isEmpty()
                     || jobDescriptionArea.getText().trim().isEmpty()
+                || jobCategoryBox.getSelectedIndex() == 0
                     || jobSalaryField.getText().trim().isEmpty()) {
 
                 JOptionPane.showMessageDialog(this, "All fields are required.");
@@ -230,6 +247,7 @@ public class JobPortal extends JFrame{
             job.setJobCompany(jobCompanyField.getText());
             job.setJobLocation(jobLocationField.getText());
             job.setJobDescription(jobDescriptionArea.getText());
+          job.setJobCategory((String) jobCategoryBox.getSelectedItem());
             job.setJobSalary(Double.parseDouble(jobSalaryField.getText()));
 
             saveJobs();
@@ -244,6 +262,7 @@ public class JobPortal extends JFrame{
                 || jobCompanyField.getText().trim().isEmpty()
                 || jobLocationField.getText().trim().isEmpty()
                 || jobDescriptionArea.getText().trim().isEmpty()
+            || jobCategoryBox.getSelectedIndex() == 0
                 || jobSalaryField.getText().trim().isEmpty()) {
 
             JOptionPane.showMessageDialog(this, "All fields are required.");
@@ -263,6 +282,7 @@ public class JobPortal extends JFrame{
                 jobCompanyField.getText(),
                 jobLocationField.getText(),
                 jobDescriptionArea.getText(),
+          (String) jobCategoryBox.getSelectedItem(),
                 salary
         );
 
@@ -279,6 +299,7 @@ public class JobPortal extends JFrame{
         jobCompanyField.setText("");
         jobLocationField.setText("");
         jobDescriptionArea.setText("");
+    jobCategoryBox.setSelectedIndex(0);
         jobSalaryField.setText("");
     }
 
