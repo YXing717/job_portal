@@ -1,36 +1,40 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Employer Panel</title>
-<link rel="stylesheet" href="style.css">
+    <title>Employer Panel</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
-<h1>Employer - View Applications</h1>
+<h1>Employer Panel</h1>
 
 <table>
-
-<thead>
-<tr>
-<th>Job Title</th>
-<th>Company</th>
-<th>Date</th>
-<th>Status</th>
-<th>Action</th>
-</tr>
-</thead>
-
-<tbody id="employerTable">
-</tbody>
-
+    <thead>
+        <tr>
+            <th>Job Title</th>
+            <th>Company</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody id="employerTable"></tbody>
 </table>
 
-<br>
+<!-- Modal for status update -->
+<div id="modal" class="modal">
+  <div class="modal-content">
+    <span id="close-modal" class="close">&times;</span>
+    <h3>Update Status</h3>
+    <select id="status-select">
+      <option value="Viewed">Viewed</option>
+      <option value="Interview Scheduled">Interview Scheduled</option>
+      <option value="Rejected">Rejected</option>
+    </select>
+    <button onclick="saveStatus()">Save</button>
+  </div>
+</div>
 
-<a href="dashboard.html">Go to Dashboard</a>
-
-<script src="script.js"></script>
-
+<script src="dashboard.js"></script>
 </body>
 </html>

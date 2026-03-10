@@ -1,37 +1,28 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Apply Job</title>
-<link rel="stylesheet" href="style.css">
+    <title>Apply Job</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
 <h1>Apply for Job</h1>
 
 <div class="job">
-
-<h3>Frontend Developer</h3>
-<p>Company: ABC Company</p>
-<button onclick="applyJob('Frontend Developer','ABC Company')">Apply</button>
-
+    <h3>Frontend Developer</h3>
+    <p>Company: ABC Company</p>
+    <button id="apply-btn-frontend" onclick="applyJob('Frontend Developer','ABC Company', 'apply-btn-frontend')">Apply</button>
 </div>
 
 <div class="job">
-
-<h3>Backend Developer</h3>
-<p>Company: XYZ Tech</p>
-<button onclick="applyJob('Backend Developer','XYZ Tech')">Apply</button>
-
+    <h3>Backend Developer</h3>
+    <p>Company: XYZ Tech</p>
+    <button id="apply-btn-backend" onclick="applyJob('Backend Developer','XYZ Tech', 'apply-btn-backend')">Apply</button>
 </div>
 
 <br>
+<a href="dashboard.html">Go to My Dashboard</a> | <a href="employer.html">Employer Panel</a>
 
-<a href="dashboard.html">Go to My Dashboard</a>
-<br>
-<a href="employer.html">Employer Panel</a>
-
-<script src="script.js"></script>
-
+<script src="dashboard.js"></script>
 </body>
 </html>
