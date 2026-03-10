@@ -1,169 +1,31 @@
-
 <!DOCTYPE html>
 <html>
 <head>
-  <title>My Application Dashboard</title>
-
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f6f9;
-      margin: 0;
-      padding: 20px;
-    }
-
-    h1 {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-
-    .summary {
-      display: flex;
-      justify-content: space-around;
-      margin-bottom: 30px;
-    }
-
-    .card {
-      background: white;
-      padding: 20px;
-      width: 150px;
-      text-align: center;
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-
-    .card h2 {
-      margin: 0;
-      font-size: 28px;
-    }
-
-    .card p {
-      margin: 5px 0 0;
-      color: gray;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background: white;
-      border-radius: 8px;
-      overflow: hidden;
-    }
-
-    th {
-      background-color: #007bff;
-      color: white;
-      padding: 12px;
-      text-align: left;
-    }
-
-    td {
-      padding: 10px;
-      border-bottom: 1px solid #ddd;
-    }
-
-    tr:hover {
-      background-color: #f1f1f1;
-    }
-
-    .status {
-      padding: 5px 10px;
-      border-radius: 15px;
-      color: white;
-      font-size: 12px;
-    }
-
-    .applied {
-      background-color: #007bff;
-    }
-
-    .review {
-      background-color: orange;
-    }
-
-    .interview {
-      background-color: purple;
-    }
-
-    .rejected {
-      background-color: red;
-    }
-
-    .accepted {
-      background-color: green;
-    }
-  </style>
+    <title>Job Application Dashboard</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<h1>My Application Dashboard</h1>
+<h1>My Job Applications</h1>
 
-<!-- Summary Cards -->
-<div class="summary">
-  <div class="card">
-    <h2 id="totalCount">0</h2>
-    <p>Total Applications</p>
-  </div>
-
-  <div class="card">
-    <h2 id="interviewCount">0</h2>
-    <p>Interview</p>
-  </div>
-
-  <div class="card">
-    <h2 id="acceptedCount">0</h2>
-    <p>Accepted</p>
-  </div>
-</div>
-
-<!-- Application Table -->
 <table>
-  <thead>
-    <tr>
-      <th>Job Title</th>
-      <th>Status</th>
-    </tr>
-  </thead>
-  <tbody id="applicationTable">
-  </tbody>
+
+<thead>
+<tr>
+<th>Job Title</th>
+<th>Company</th>
+<th>Application Date</th>
+<th>Status</th>
+</tr>
+</thead>
+
+<tbody id="applicationTable">
+</tbody>
+
 </table>
 
-<script>
-  let applications = JSON.parse(localStorage.getItem("applications")) || [];
-
-  const table = document.getElementById("applicationTable");
-
-  let interview = 0;
-  let accepted = 0;
-
-  applications.forEach(app => {
-
-    if (app.status === "Interview") interview++;
-    if (app.status === "Accepted") accepted++;
-
-    let statusClass = "applied";
-
-    if (app.status === "Under Review") statusClass = "review";
-    if (app.status === "Interview") statusClass = "interview";
-    if (app.status === "Rejected") statusClass = "rejected";
-    if (app.status === "Accepted") statusClass = "accepted";
-
-    const row = document.createElement("tr");
-
-    row.innerHTML = `
-      <td>${app.title}</td>
-      <td><span class="status ${statusClass}">${app.status}</span></td>
-    `;
-
-    table.appendChild(row);
-  });
-
-  document.getElementById("totalCount").innerText = applications.length;
-  document.getElementById("interviewCount").innerText = interview;
-  document.getElementById("acceptedCount").innerText = accepted;
-
-</script>
+<script src="dashboard.js"></script>
 
 </body>
 </html>
