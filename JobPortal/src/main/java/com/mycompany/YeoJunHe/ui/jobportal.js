@@ -200,48 +200,111 @@ modalClose.addEventListener('click', closeModal);
 modal.addEventListener('click', e => { if(e.target === modal) closeModal(); });
 
 // --- saved jobs helpers using localStorage --------------------------------
-function getSavedJobs(){
-  // attempt localStorage first
+function getJobKey(job){
+  if(!job) return '';
+  return `${normalize(job.title)}|${normalize(job.location)}|${job.salary}`;
+}
+
+function parseSavedJobsRaw(raw){
+  if(!raw) return [];
+  // parse JSON usually stored by our code
+  try{
+    const arr = JSON.parse(raw);
+    if(Array.isArray(arr)){
+      return arr.map(item => {
+        if(typeof item === 'string') return item;
+        if(item && typeof item === 'object') return getJobKey(item);
+        return null;
+      }).filter(Boolean);
+    }
+    // if it is a single object (old format), normalize to key
+    if(arr && typeof arr === 'object'){
+      return [getJobKey(arr)];
+    }
+  }catch(e){
+    // fall through to fallback parsing
+  }
+
+  // Fallback: raw might be a comma-separated list of keys (legacy format)
+  const parts = raw.split(',').map(s=>s.trim()).filter(Boolean);
+  if(parts.length) return parts;
+
+  return [];
+}
+
+function getSavedKeys(){
   let raw = localStorage.getItem('savedJobs');
-  if(!raw){
-    // fallback to sessionStorage (transfer from previous page nav)
-    raw = sessionStorage.getItem('savedJobs');
-  }
-  // also support receiving from URL hash (encoded JSON)
+  if(!raw) raw = sessionStorage.getItem('savedJobs');
   if(!raw && location.hash.startsWith('#saved=')){
-    try{
-      raw = decodeURIComponent(location.hash.slice(7));
-    }catch(e){ raw = null; }
+    try{ raw = decodeURIComponent(location.hash.slice(7)); }catch(e){ raw = null; }
   }
-  return raw ? JSON.parse(raw) : [];
+  if(!raw) return [];
+  return parseSavedJobsRaw(raw);
 }
+
+function setSavedKeys(keys){
+  const str = JSON.stringify(Array.from(new Set(keys)));
+  localStorage.setItem('savedJobs', str);
+  sessionStorage.setItem('savedJobs', str);
+
+  // keep a copy of the full saved job objects so profile.html can render them without needing the full JOBS list
+  const jobs = JOBS.filter(j => keys.has(getJobKey(j)));
+  const jobsStr = JSON.stringify(jobs);
+  localStorage.setItem('savedJobsData', jobsStr);
+  sessionStorage.setItem('savedJobsData', jobsStr);
+}
+
+function applySavedMarkers(){
+  const keys = new Set(getSavedKeys());
+  for(const j of JOBS){
+    j.saved = keys.has(getJobKey(j));
+  }
+  return keys;
+}
+
+function getSavedJobs(){
+  // derive saved job objects from the current job list, based on saved markers
+  applySavedMarkers();
+  return JOBS.filter(j => j.saved);
+}
+
 function isJobSaved(job){
-  return getSavedJobs().some(j=>j.title===job.title && j.location===job.location && j.salary===job.salary);
+  if(!job) return false;
+  if(typeof job.saved === 'boolean') return job.saved;
+  const keys = new Set(getSavedKeys());
+  return keys.has(getJobKey(job));
 }
+
 function saveJob(job){
-  const list = getSavedJobs();
-  if(!isJobSaved(job)){
-    list.push(job);
-    const str = JSON.stringify(list);
-    localStorage.setItem('savedJobs', str);
-    sessionStorage.setItem('savedJobs', str);
-    showSnackbar('Job saved!');
-  }
-}
-function removeSavedJob(job){
-  let list = getSavedJobs();
-  const before = list.length;
-  list = list.filter(j=>!(j.title===job.title && j.location===job.location && j.salary===job.salary));
-  if(list.length < before){
-    const str = JSON.stringify(list);
-    localStorage.setItem('savedJobs', str);
-    sessionStorage.setItem('savedJobs', str);
-    showSnackbar('Removed from saved');
+  const keys = new Set(getSavedKeys());
+  const key = getJobKey(job);
+  if(!keys.has(key)){
+    keys.add(key);
+    setSavedKeys(keys);
+    applySavedMarkers();
+    showSnackbar('Job saved!', 'success');
   }
 }
 
+function removeSavedJob(job){
+  const keys = new Set(getSavedKeys());
+  const key = getJobKey(job);
+  if(keys.has(key)){
+    keys.delete(key);
+    setSavedKeys(keys);
+    applySavedMarkers();
+    showSnackbar('Removed from saved', 'success');
+  }
+}
+
+function clearSavedJobs(){
+  setSavedKeys([]);
+  applySavedMarkers();
+  showSnackbar('All saved jobs cleared', 'success');
+}
+
 // simple toast message at bottom
-function showSnackbar(msg){
+function showSnackbar(msg, type='success'){
   let sn = document.getElementById('snackbar');
   if(!sn){
     sn = document.createElement('div');
@@ -250,12 +313,10 @@ function showSnackbar(msg){
     document.body.appendChild(sn);
   }
   sn.textContent = msg;
-  sn.className = 'snackbar show';
+  sn.className = `snackbar show ${type}`;
   setTimeout(()=>{ sn.className = 'snackbar'; }, 3000);
 }
 
-// update modal open/close to manage save button
-const modalSave = document.getElementById('modalSave');
 function openModal(job){
   modalTitle.textContent = job.title;
   modalMeta.textContent = `${job.location} • RM${job.salary.toLocaleString()}`;
@@ -263,31 +324,6 @@ function openModal(job){
                 .replace(/\n/g,'<br>')
                 .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
   modalDescription.innerHTML = html;
-  // configure save button
-  if(modalSave){
-    modalSave.style.display = 'inline-block';
-    const updateSaveText = () => {
-      if(isJobSaved(job)){
-        modalSave.textContent = 'Saved';
-        modalSave.classList.add('saved');
-      } else {
-        modalSave.textContent = 'Save';
-        modalSave.classList.remove('saved');
-      }
-    };
-    updateSaveText();
-    modalSave.onclick = e => {
-      e.stopPropagation();
-      if(isJobSaved(job)){
-        removeSavedJob(job);
-      } else {
-        saveJob(job);
-      }
-      updateSaveText();
-      // refresh listing so cards show updated icon
-      if(currentResults && currentResults.length){ renderResults(currentPage); }
-    };
-  }
   modal.style.display = 'flex';
   modal.setAttribute('aria-hidden','false');
 }
@@ -364,7 +400,15 @@ function getPageSize(){
 function renderResults(page=1){
   const pageSize = getPageSize();
   currentPage = page;
-  const total = currentResults.length;
+
+  // prioritize saved jobs first (keeps other results order stable)
+  const sortedResults = currentResults.slice().sort((a,b) => {
+    const aSaved = isJobSaved(a) ? 1 : 0;
+    const bSaved = isJobSaved(b) ? 1 : 0;
+    return bSaved - aSaved;
+  });
+
+  const total = sortedResults.length;
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
   if(page>totalPages) page = totalPages;
   const from = (page-1)*pageSize;
@@ -387,7 +431,7 @@ function renderResults(page=1){
   }
 
   for(let i=from;i<to;i++){
-    const j = currentResults[i];
+    const j = sortedResults[i];
     const card = document.createElement('div'); card.className='job-card';
     const left = document.createElement('div'); left.className='job-left';
     // icon representing a briefcase for jobs
@@ -402,11 +446,40 @@ function renderResults(page=1){
       left.appendChild(tags);
     }
     const right = document.createElement('div'); right.className='job-right';
-    // if already saved, mark with heart
+
+    // save / unsave toggle button (also updates the saved count badge)
+    const saveBtn = document.createElement('button');
+    saveBtn.className = 'btn save job-save-btn';
+    const updateSaveBtn = () => {
+      if(isJobSaved(j)){
+        saveBtn.textContent = '★ Saved';
+        saveBtn.title = 'Remove from saved jobs';
+        saveBtn.classList.add('saved');
+      } else {
+        saveBtn.textContent = '☆ Save';
+        saveBtn.title = 'Save job';
+        saveBtn.classList.remove('saved');
+      }
+    };
+    updateSaveBtn();
+    saveBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      if(isJobSaved(j)){
+        removeSavedJob(j);
+      } else {
+        saveJob(j);
+      }
+      updateSaveBtn();
+      renderResults(currentPage);
+    });
+    right.appendChild(saveBtn);
+
+    // if already saved, show a badge marker
     if(isJobSaved(j)){
-      const heart = document.createElement('span'); heart.textContent='❤️'; heart.title='Saved';
-      right.appendChild(heart);
+      const badge = document.createElement('span'); badge.className='saved-badge'; badge.textContent='Saved';
+      right.appendChild(badge);
     }
+
     card.appendChild(left); card.appendChild(right);
     // show detail modal when clicking the card
     card.addEventListener('click', () => openModal(j));
@@ -494,7 +567,9 @@ input.addEventListener('keydown', e => {
 // header avatar/upload handling and profile navigation
 const avatarImg = document.getElementById('avatarImg');
 const avatarInput = document.getElementById('avatarInput');
+// edit button is now a label; no JS reference needed
 const profileBtn = document.getElementById('profileBtn');
+const savedCountBadge = document.getElementById('savedCount');
 
 function loadAvatar(){
   const data = localStorage.getItem('avatar');
@@ -502,6 +577,17 @@ function loadAvatar(){
 }
 function saveAvatar(dataUrl){
   localStorage.setItem('avatar', dataUrl);
+}
+
+function updateSavedCount(){
+  if(!savedCountBadge) return;
+  const count = getSavedJobs().length;
+  if(count > 0){
+    savedCountBadge.textContent = count;
+    savedCountBadge.style.display = 'flex';
+  } else {
+    savedCountBadge.style.display = 'none';
+  }
 }
 if(avatarInput){
   avatarInput.addEventListener('change', e => {
@@ -517,24 +603,46 @@ if(avatarInput){
     }
   });
 }
+// no JS needed for edit label since <label for="avatarInput"> handles click
 
 if(profileBtn){
-  profileBtn.addEventListener('click', () => {
-    // ensure storage is synced and also include hash data in case origins differ
-    const list = JSON.stringify(getSavedJobs());
-    sessionStorage.setItem('savedJobs', list);
-    const hash = '#saved=' + encodeURIComponent(list);
-    window.location.href = 'string2/profile.html' + hash;
+  profileBtn.addEventListener('click', e => {
+    // guard against default navigation so we can save data first
+    e.preventDefault();
+    try{
+      const list = JSON.stringify(getSavedJobs());
+      sessionStorage.setItem('savedJobs', list);
+      const hash = '#saved=' + encodeURIComponent(list);
+      // if JS fails later, fall back to anchor href
+      window.location.href = profileBtn.href + hash;
+    }catch(err){
+      // still navigate even if storage is unavailable
+      window.location.href = profileBtn.href;
+    }
   });
 }
 
+// keep badge updated when jobs change
+const origSaveJob = saveJob;
+const origRemoveSavedJob = removeSavedJob;
+saveJob = function(job){
+  origSaveJob(job);
+  updateSavedCount();
+};
+removeSavedJob = function(job){
+  origRemoveSavedJob(job);
+  updateSavedCount();
+};
+
 // initial avatar load
 loadAvatar();
+// initial count badge
+updateSavedCount();
 
 if(pageSizeInput){
   pageSizeInput.addEventListener('change', ()=> renderResults(1));
 }
 
 // initial empty state
-currentResults = [];
+currentResults = JOBS;
 renderResults(1);
