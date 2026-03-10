@@ -1,22 +1,13 @@
-let applications = [
-
-{
-title:"Frontend Developer",
-company:"ABC Company",
-date:"10 March 2026",
-status:"Submitted"
-},
-
-{
-title:"Backend Developer",
-company:"XYZ Tech",
-date:"8 March 2026",
-status:"Pending Review"
-}
-
-];
+let applications = JSON.parse(localStorage.getItem("applications")) || [];
 
 const table = document.getElementById("applicationTable");
+
+if(applications.length === 0){
+
+table.innerHTML =
+"<tr><td colspan='4'>No applications found</td></tr>";
+
+}else{
 
 applications.forEach(function(app){
 
@@ -32,3 +23,5 @@ row.innerHTML = `
 table.appendChild(row);
 
 });
+
+}
