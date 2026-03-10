@@ -15,6 +15,7 @@
             <th>Company</th>
             <th>Date</th>
             <th>Status</th>
+            <th>Interview</th>
             <th>Action</th>
         </tr>
     </thead>
@@ -26,11 +27,19 @@
   <div class="modal-content">
     <span id="close-modal" class="close">&times;</span>
     <h3>Update Status</h3>
-    <select id="status-select">
+    
+    <label>Status:</label>
+    <select id="status-select" onchange="toggleInterviewInputs()">
       <option value="Viewed">Viewed</option>
       <option value="Interview Scheduled">Interview Scheduled</option>
       <option value="Rejected">Rejected</option>
     </select>
+
+    <div id="interviewInputs" style="display:none; margin-top:10px;">
+      <label>Interview Date: <input type="date" id="interview-date"></label><br><br>
+      <label>Interview Time: <input type="time" id="interview-time"></label>
+    </div>
+
     <button onclick="saveStatus()">Save</button>
   </div>
 </div>
