@@ -38,6 +38,8 @@ body{font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Rob
 /* job card tags */
 .job-tags{margin-top:6px;font-size:0.9em;color:var(--muted);}
 
+.saved-badge{margin-left:10px;padding:2px 8px;border-radius:999px;background:rgba(124,58,237,0.25);color:var(--accent);font-size:12px;font-weight:600;}
+
 @keyframes colorCycle{0%{color:#e6eef8;}50%{color:#7c3aed;}100%{color:#e6eef8;}}
 
 .search-panel{margin-top:20px;background:linear-gradient(135deg,rgba(124,58,237,0.05),rgba(11,18,32,0.1));padding:18px;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,0.4)}
@@ -115,6 +117,9 @@ select{padding:10px;border-radius:8px;background:#07122a;border:1px solid rgba(2
 .btn.save{margin-top:12px;background:transparent;color:var(--accent);border:1px solid var(--accent);}
 .btn.save:hover{background:rgba(124,58,237,0.1)}
 .btn.save.saved{background:var(--accent);color:#fff;border:none}
+
+/* highlight helper (used for "Search saved" when saved jobs exist) */
+.btn.highlight{box-shadow:0 0 0 2px rgba(124,58,237,0.75);}
 
 /* remove button usually shown in profile page */
 .btn.remove{background:#db3434;color:#fff;border:none;padding:8px 12px;border-radius:8px;cursor:pointer}
