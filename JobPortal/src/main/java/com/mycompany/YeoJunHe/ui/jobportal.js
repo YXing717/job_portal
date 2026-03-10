@@ -282,7 +282,7 @@ function saveJob(job){
     keys.add(key);
     setSavedKeys(keys);
     applySavedMarkers();
-    showSnackbar('Job saved!');
+    showSnackbar('Job saved!', 'success');
   }
 }
 
@@ -293,18 +293,18 @@ function removeSavedJob(job){
     keys.delete(key);
     setSavedKeys(keys);
     applySavedMarkers();
-    showSnackbar('Removed from saved');
+    showSnackbar('Removed from saved', 'success');
   }
 }
 
 function clearSavedJobs(){
   setSavedKeys([]);
   applySavedMarkers();
-  showSnackbar('All saved jobs cleared');
+  showSnackbar('All saved jobs cleared', 'success');
 }
 
 // simple toast message at bottom
-function showSnackbar(msg){
+function showSnackbar(msg, type='success'){
   let sn = document.getElementById('snackbar');
   if(!sn){
     sn = document.createElement('div');
@@ -313,12 +313,10 @@ function showSnackbar(msg){
     document.body.appendChild(sn);
   }
   sn.textContent = msg;
-  sn.className = 'snackbar show';
+  sn.className = `snackbar show ${type}`;
   setTimeout(()=>{ sn.className = 'snackbar'; }, 3000);
 }
 
-// update modal open/close to manage save button
-const modalSave = document.getElementById('modalSave');
 function openModal(job){
   modalTitle.textContent = job.title;
   modalMeta.textContent = `${job.location} • RM${job.salary.toLocaleString()}`;
@@ -326,31 +324,6 @@ function openModal(job){
                 .replace(/\n/g,'<br>')
                 .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
   modalDescription.innerHTML = html;
-  // configure save button
-  if(modalSave){
-    modalSave.style.display = 'inline-block';
-    const updateSaveText = () => {
-      if(isJobSaved(job)){
-        modalSave.textContent = 'Saved';
-        modalSave.classList.add('saved');
-      } else {
-        modalSave.textContent = 'Save';
-        modalSave.classList.remove('saved');
-      }
-    };
-    updateSaveText();
-    modalSave.onclick = e => {
-      e.stopPropagation();
-      if(isJobSaved(job)){
-        removeSavedJob(job);
-      } else {
-        saveJob(job);
-      }
-      updateSaveText();
-      // refresh listing so cards show updated icon
-      if(currentResults && currentResults.length){ renderResults(currentPage); }
-    };
-  }
   modal.style.display = 'flex';
   modal.setAttribute('aria-hidden','false');
 }
@@ -427,7 +400,15 @@ function getPageSize(){
 function renderResults(page=1){
   const pageSize = getPageSize();
   currentPage = page;
-  const total = currentResults.length;
+
+  // prioritize saved jobs first (keeps other results order stable)
+  const sortedResults = currentResults.slice().sort((a,b) => {
+    const aSaved = isJobSaved(a) ? 1 : 0;
+    const bSaved = isJobSaved(b) ? 1 : 0;
+    return bSaved - aSaved;
+  });
+
+  const total = sortedResults.length;
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
   if(page>totalPages) page = totalPages;
   const from = (page-1)*pageSize;
@@ -450,7 +431,7 @@ function renderResults(page=1){
   }
 
   for(let i=from;i<to;i++){
-    const j = currentResults[i];
+    const j = sortedResults[i];
     const card = document.createElement('div'); card.className='job-card';
     const left = document.createElement('div'); left.className='job-left';
     // icon representing a briefcase for jobs

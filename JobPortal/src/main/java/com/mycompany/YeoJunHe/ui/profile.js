@@ -66,6 +66,48 @@ function updateSavedCount(count){
   }
 }
 
+function showSnackbar(msg, type='success'){
+  let sn = document.getElementById('snackbar');
+  if(!sn){
+    sn = document.createElement('div');
+    sn.id='snackbar';
+    sn.className='snackbar';
+    document.body.appendChild(sn);
+  }
+  sn.textContent = msg;
+  sn.className = `snackbar show ${type}`;
+  setTimeout(()=>{ sn.className = 'snackbar'; }, 3000);
+}
+
+const modal = document.getElementById('detailModal');
+const modalTitle = document.getElementById('modalTitle');
+const modalMeta = document.getElementById('modalMeta');
+const modalDescription = document.getElementById('modalDescription');
+const modalClose = document.getElementById('modalClose');
+
+function openModal(job){
+  modalTitle.textContent = job.title;
+  modalMeta.textContent = `${job.location} • RM${(job.salary||0).toLocaleString()}`;
+  const html = (job.description || '')
+                .replace(/\n/g,'<br>')
+                .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
+  modalDescription.innerHTML = html;
+  modal.style.display = 'flex';
+  modal.setAttribute('aria-hidden','false');
+}
+
+function closeModal(){
+  modal.style.display = 'none';
+  modal.setAttribute('aria-hidden','true');
+}
+
+if(modalClose){
+  modalClose.addEventListener('click', closeModal);
+}
+if(modal){
+  modal.addEventListener('click', e => { if(e.target === modal) closeModal(); });
+}
+
 function renderSavedJobs(){
   const container = document.getElementById('savedJobs');
   const jobs = getSavedJobsFromStorage();
@@ -121,11 +163,13 @@ function renderSavedJobs(){
       e.stopPropagation();
       const list = getSavedJobsFromStorage().filter(j => getJobKey(j) !== getJobKey(job));
       setSavedJobs(list);
+      showSnackbar('Removed from saved', 'success');
       renderSavedJobs();
     });
 
     right.appendChild(removeBtn);
 
+    card.addEventListener('click', () => openModal(job));
     card.appendChild(left);
     card.appendChild(right);
     container.appendChild(card);
@@ -172,6 +216,7 @@ const clearBtn = document.getElementById('clearBtn');
 if(clearBtn){
   clearBtn.addEventListener('click', () => {
     setSavedJobs([]);
+    showSnackbar('All saved jobs cleared', 'success');
     renderSavedJobs();
   });
 }
