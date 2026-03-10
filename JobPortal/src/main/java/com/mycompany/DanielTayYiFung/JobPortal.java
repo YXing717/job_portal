@@ -17,14 +17,17 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.BoxLayout;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.CardLayout;
+import java.awt.Dimension;
+import java.awt.Component;
 
 public class JobPortal extends JFrame{
   private CardLayout cardLayout;
-    private JPanel mainPanel;
+  private JPanel mainPanel;
   
   private JComboBox<JobPost> jobList;
   private JTextField jobTitleField;
@@ -38,7 +41,7 @@ public class JobPortal extends JFrame{
   private final String FILE_NAME = "jobs.csv";
 
   private boolean updateMode = false;
-    private JPanel jobListPanel;
+  private JPanel jobListPanel;
 
   public JobPortal() {
         loadJobs();
@@ -47,7 +50,7 @@ public class JobPortal extends JFrame{
         setSize(500, 400);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
-    cardLayout = new CardLayout();
+        cardLayout = new CardLayout();
         mainPanel = new JPanel(cardLayout);
 
         mainPanel.add(createMenuPanel(), "MENU");
@@ -58,13 +61,28 @@ public class JobPortal extends JFrame{
         cardLayout.show(mainPanel, "MENU");
     }
 
+  // UI methods
   private JPanel createMenuPanel() {
 
-        JPanel panel = new JPanel(new GridLayout(2, 1, 20, 20));
-
+        JPanel panel = new JPanel(new BorderLayout(20, 20));
+        // title
+        JLabel title = new JLabel("Job Portal System", JLabel.CENTER);
+        title.setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 24));
+        panel.add(title, BorderLayout.NORTH);
+        // button container
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
         JButton createBtn = new JButton("Create New Job Post");
         JButton updateBtn = new JButton("Update Existing Job Post");
-
+        createBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+        updateBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+        createBtn.setMaximumSize(new Dimension(250, 40));
+        updateBtn.setMaximumSize(new Dimension(250, 40));
+        buttonPanel.add(createBtn);
+        buttonPanel.add(javax.swing.Box.createVerticalStrut(20));
+        buttonPanel.add(updateBtn);
+        panel.add(buttonPanel, BorderLayout.CENTER);
+        // button actions
         createBtn.addActionListener(e -> {
             updateMode = false;
             clearFields();
@@ -72,7 +90,6 @@ public class JobPortal extends JFrame{
             jobListPanel.setVisible(false);
             cardLayout.show(mainPanel, "FORM");
         });
-
         updateBtn.addActionListener(e -> {
             updateMode = true;
 
@@ -84,10 +101,6 @@ public class JobPortal extends JFrame{
 
             cardLayout.show(mainPanel, "FORM");
         });
-
-        panel.add(createBtn);
-        panel.add(updateBtn);
-
         return panel;
     }
 
@@ -119,7 +132,7 @@ public class JobPortal extends JFrame{
         jobDescriptionArea = new JTextArea();
         form.add(new JScrollPane(jobDescriptionArea));
 
-form.add(new JLabel("Category:"));
+        form.add(new JLabel("Category:"));
         jobCategoryBox = new JComboBox<>(new String[]{
             "Select Category",
             "IT",
@@ -166,15 +179,7 @@ form.add(new JLabel("Category:"));
         return panel;
     }
 
-  private void clearFields() {
-        jobTitleField.setText("");
-        jobCompanyField.setText("");
-        jobLocationField.setText("");
-        jobDescriptionArea.setText("");
-    jobCategoryBox.setSelectedIndex(0);
-        jobSalaryField.setText("");
-    }
-  
+  // file methods
   private void loadJobs() {
         try (BufferedReader br = new BufferedReader(new FileReader(FILE_NAME))) {
             String line;
@@ -189,7 +194,7 @@ form.add(new JLabel("Category:"));
                 String company = data[1];
                 String location = data[2];
                 String description = data[3];
-              String category = data[4];
+                String category = data[4];
                 double salary;
 
               try {
@@ -208,7 +213,7 @@ form.add(new JLabel("Category:"));
     private boolean saveJobs() {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(FILE_NAME))) {
           bw.write("Title,Company,Location,Description,Category,Salary");
-            bw.newLine();  
+          bw.newLine();  
           
           for (JobPost job : jobs) {
                 bw.write(
@@ -230,6 +235,16 @@ form.add(new JLabel("Category:"));
         }
     }
 
+    // utility methods
+    private void clearFields() {
+        jobTitleField.setText("");
+        jobCompanyField.setText("");
+        jobLocationField.setText("");
+        jobDescriptionArea.setText("");
+        jobCategoryBox.setSelectedIndex(0);
+        jobSalaryField.setText("");
+    }
+  
     private void displaySelectedJob() {
         JobPost job = (JobPost) jobList.getSelectedItem();
         
@@ -238,7 +253,7 @@ form.add(new JLabel("Category:"));
             jobCompanyField.setText(job.getJobCompany());
             jobLocationField.setText(job.getJobLocation());
             jobDescriptionArea.setText(job.getJobDescription());
-          jobCategoryBox.setSelectedItem(job.getJobCategory());
+            jobCategoryBox.setSelectedItem(job.getJobCategory());
             jobSalaryField.setText(String.valueOf(job.getJobSalary()));
         }
     }
@@ -252,7 +267,7 @@ form.add(new JLabel("Category:"));
                     || jobCompanyField.getText().trim().isEmpty()
                     || jobLocationField.getText().trim().isEmpty()
                     || jobDescriptionArea.getText().trim().isEmpty()
-                || jobCategoryBox.getSelectedIndex() == 0
+                    || jobCategoryBox.getSelectedIndex() == 0
                     || jobSalaryField.getText().trim().isEmpty()) {
 
                 JOptionPane.showMessageDialog(this, "All fields are required.");
@@ -272,7 +287,7 @@ form.add(new JLabel("Category:"));
             job.setJobCompany(jobCompanyField.getText());
             job.setJobLocation(jobLocationField.getText());
             job.setJobDescription(jobDescriptionArea.getText());
-          job.setJobCategory((String) jobCategoryBox.getSelectedItem());
+            job.setJobCategory((String) jobCategoryBox.getSelectedItem());
             job.setJobSalary(Double.parseDouble(jobSalaryField.getText()));
 
             if (saveJobs()) {
@@ -281,12 +296,13 @@ form.add(new JLabel("Category:"));
         }
     }
 
+  // CRUD methods
   public void addJob() {
         if (jobTitleField.getText().trim().isEmpty()
                 || jobCompanyField.getText().trim().isEmpty()
                 || jobLocationField.getText().trim().isEmpty()
                 || jobDescriptionArea.getText().trim().isEmpty()
-            || jobCategoryBox.getSelectedIndex() == 0
+                || jobCategoryBox.getSelectedIndex() == 0
                 || jobSalaryField.getText().trim().isEmpty()) {
 
             JOptionPane.showMessageDialog(this, "All fields are required.");
@@ -306,7 +322,7 @@ form.add(new JLabel("Category:"));
                 jobCompanyField.getText(),
                 jobLocationField.getText(),
                 jobDescriptionArea.getText(),
-          (String) jobCategoryBox.getSelectedItem(),
+                (String) jobCategoryBox.getSelectedItem(),
                 salary
         );
 
@@ -323,7 +339,7 @@ form.add(new JLabel("Category:"));
         jobCompanyField.setText("");
         jobLocationField.setText("");
         jobDescriptionArea.setText("");
-    jobCategoryBox.setSelectedIndex(0);
+        jobCategoryBox.setSelectedIndex(0);
         jobSalaryField.setText("");
     }
 
