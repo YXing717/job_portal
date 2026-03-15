@@ -4,3 +4,5 @@
 /JobPortal/src/main/java/com/mycompany/gunyuxing/node_modules
 /JobPortal/src/main/java/com/mycompany/gunyuxing/package.json
 /JobPortal/src/main/java/com/mycompany/gunyuxing/package-lock.json
+/JobPortal/src/main/java/com/mycompany/gunyuxing/jest.config.js
+/JobPortal/src/main/java/com/mycompany/gunyuxing/jest.setup.js
