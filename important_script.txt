@@ -1,0 +1,23 @@
+// Check node.js exist
+node -v
+
+// Navigate to your root folder
+cd JobPortal/src/main/java/com/mycompany/your_name
+
+// Create files
+npm init -y             # package.json
+
+// Installation
+npm install --save-dev jest jsdom           # testing environment
+npm install --save-dev jest jsdom jest-environment-jsdom        # install jsdom separartely
+npm install --save-dev @types/jest          # optional, for better IntelliSense
+
+// .gitignore
+/JobPortal/src/main/java/com/mycompany/your_name/node_modules
+/JobPortal/src/main/java/com/mycompany/your_name/package.json
+/JobPortal/src/main/java/com/mycompany/your_name/package-lock.json
+/JobPortal/src/main/java/com/mycompany/your_name/jest.config.js
+/JobPortal/src/main/java/com/mycompany/your_name/jest.setup.js
+
+// Run your test files
+npm test
