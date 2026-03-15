@@ -1,2 +1,6 @@
 /job_portal/target/
 /JobPortal/target/
+
+/JobPortal/src/main/java/com/mycompany/gunyuxing/node_modules
+/JobPortal/src/main/java/com/mycompany/gunyuxing/package.json
+/JobPortal/src/main/java/com/mycompany/gunyuxing/package-lock.json
