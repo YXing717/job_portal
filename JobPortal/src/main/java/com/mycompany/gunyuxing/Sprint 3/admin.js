@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
         users.sort((a, b) => new Date(b.registeredAt) - new Date(a.registeredAt)); // Newest first
 
-        users.forEach((user, index) => {
+        users.forEach(user => {
             const row = document.createElement('tr');
             
             const nameCell = document.createElement('td');
@@ -22,24 +22,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const date = new Date(user.registeredAt);
             dateCell.textContent = date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
 
-            const actionCell = document.createElement('td');
-            const deleteBtn = document.createElement('button');
-            deleteBtn.textContent = 'Delete';
-            deleteBtn.className = 'btn-delete';
-            deleteBtn.onclick = () => {
-                if (confirm(`Are you sure you want to delete ${user.email}?`)) {
-                    // Filter out the deleted user
-                    const updatedUsers = users.filter(u => u.email !== user.email);
-                    localStorage.setItem('registeredUsers', JSON.stringify(updatedUsers));
-                    window.location.reload();
-                }
-            };
-            actionCell.appendChild(deleteBtn);
-
             row.appendChild(nameCell);
             row.appendChild(emailCell);
             row.appendChild(dateCell);
-            row.appendChild(actionCell);
             
             tableBody.appendChild(row);
         });
