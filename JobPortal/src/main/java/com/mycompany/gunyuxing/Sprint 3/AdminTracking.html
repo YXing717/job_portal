@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | User Tracking</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="glass-container admin-container">
+        <h1>Admin Dashboard</h1>
+        <p class="subtitle">Tracking registered job seeker accounts.</p>
+        
+        <div class="admin-table-container">
+            <table id="userTable">
+                <thead>
+                    <tr>
+                        <th>Full Name</th>
+                        <th>Email Address</th>
+                        <th>Registration Date</th>
+                    </tr>
+                </thead>
+                <tbody id="userTableBody">
+                    <!-- Rows will be populated by JS -->
+                </tbody>
+            </table>
+        </div>
+
+        <div id="noUsersMessage" style="text-align: center; color: var(--text-muted); margin-top: 24px; display: none;">
+            No users registered yet.
+        </div>
+
+        <div class="footer-link">
+            <a href="Register.html">Back to Registration Page</a>
+        </div>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>
