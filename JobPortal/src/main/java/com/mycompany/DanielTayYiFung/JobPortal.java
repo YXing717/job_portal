@@ -18,6 +18,8 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.BoxLayout;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
@@ -35,7 +37,7 @@ public class JobPortal extends JFrame{
   private JTextField jobCompanyField;
   private JTextField jobLocationField;
   private JTextArea jobDescriptionArea;
-  private JTextField jobSalaryField;
+  private JSpinner jobSalarySpinner;
   private ArrayList<JobPost> jobs = new ArrayList<>();
   private final String FILE_NAME = "jobs.csv";
   private boolean updateMode = false;
@@ -151,8 +153,10 @@ public class JobPortal extends JFrame{
         form.add(jobCategoryBox);
     
         form.add(new JLabel("Salary:"));
-        jobSalaryField = new JTextField();
-        form.add(jobSalaryField);
+        jobSalarySpinner = new JSpinner(
+                new SpinnerNumberModel(1000, 0, 50000, 500)
+        );
+        form.add(jobSalarySpinner);
 
         panel.add(form, BorderLayout.CENTER);
 
@@ -181,7 +185,6 @@ public class JobPortal extends JFrame{
                 displaySelectedJob();
             }
         });
-
         return panel;
     }
 
@@ -192,7 +195,7 @@ public class JobPortal extends JFrame{
             while ((line = br.readLine()) != null) {
                 String[] data = line.split(",");
               
-              if (data.length < 6) {
+                if (data.length < 7) {
                     continue; // skip invalid line
                 }
               
@@ -202,13 +205,7 @@ public class JobPortal extends JFrame{
                 String location = data[3];
                 String description = data[4];
                 String category = data[5];
-                double salary;
-
-              try {
-                    salary = Double.parseDouble(data[6]);
-                } catch (NumberFormatException e) {
-                    continue; // skip invalid salary
-                }
+                double salary = Double.parseDouble(data[6]);
 
                 jobs.add(new JobPost(title, type, company, location, description, category, salary));
             }
@@ -224,13 +221,13 @@ public class JobPortal extends JFrame{
           
           for (JobPost job : jobs) {
                 bw.write(
-                        job.getJobTitle() + ","
-                        + job.getJobType() + ","
-                        + job.getJobCompany() + ","
-                        + job.getJobLocation() + ","
-                        + job.getJobDescription() + ","
-                        + job.getJobCategory() + ","
-                        + job.getJobSalary()
+                        "\"" + job.getJobTitle() + "\","
+                        + "\"" + job.getJobType() + "\","
+                        + "\"" + job.getJobCompany() + "\","
+                        + "\"" + job.getJobLocation() + "\","
+                        + "\"" + job.getJobDescription() + "\","
+                        + "\"" + job.getJobCategory() + "\","
+                        + String.format("%.2f", job.getJobSalary())
                 );
                 bw.newLine();
             }
@@ -251,7 +248,7 @@ public class JobPortal extends JFrame{
         jobLocationField.setText("");
         jobDescriptionArea.setText("");
         jobCategoryBox.setSelectedIndex(0);
-        jobSalaryField.setText("");
+        jobSalarySpinner.setValue(1000);
     }
   
     private void displaySelectedJob() {
@@ -264,7 +261,7 @@ public class JobPortal extends JFrame{
             jobLocationField.setText(job.getJobLocation());
             jobDescriptionArea.setText(job.getJobDescription());
             jobCategoryBox.setSelectedItem(job.getJobCategory());
-            jobSalaryField.setText(String.valueOf(job.getJobSalary()));
+            jobSalarySpinner.setValue((int) job.getJobSalary());
         }
     }
 
@@ -278,21 +275,13 @@ public class JobPortal extends JFrame{
                     || jobCompanyField.getText().trim().isEmpty()
                     || jobLocationField.getText().trim().isEmpty()
                     || jobDescriptionArea.getText().trim().isEmpty()
-                    || jobCategoryBox.getSelectedIndex() == 0
-                    || jobSalaryField.getText().trim().isEmpty()) {
+                    || jobCategoryBox.getSelectedIndex() == 0) {
 
                 JOptionPane.showMessageDialog(this, "All fields are required.");
                 return;
             }
 
-            // salary validation
-            double salary;
-            try {
-                salary = Double.parseDouble(jobSalaryField.getText());
-            } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(this, "Salary must be a valid number.");
-                return;
-            }  
+            double salary = (int) jobSalarySpinner.getValue();
           
             job.setJobTitle(jobTitleField.getText());
             job.setJobType((String) jobTypeBox.getSelectedItem());
@@ -300,7 +289,7 @@ public class JobPortal extends JFrame{
             job.setJobLocation(jobLocationField.getText());
             job.setJobDescription(jobDescriptionArea.getText());
             job.setJobCategory((String) jobCategoryBox.getSelectedItem());
-            job.setJobSalary(Double.parseDouble(jobSalaryField.getText()));
+            job.setJobSalary(salary);
 
             if (saveJobs()) {
                 JOptionPane.showMessageDialog(this, "Job updated successfully!");
@@ -315,20 +304,13 @@ public class JobPortal extends JFrame{
                 || jobCompanyField.getText().trim().isEmpty()
                 || jobLocationField.getText().trim().isEmpty()
                 || jobDescriptionArea.getText().trim().isEmpty()
-                || jobCategoryBox.getSelectedIndex() == 0
-                || jobSalaryField.getText().trim().isEmpty()) {
+                || jobCategoryBox.getSelectedIndex() == 0) {
 
             JOptionPane.showMessageDialog(this, "All fields are required.");
             return;
         }
 
-        double salary;
-        try {
-            salary = Double.parseDouble(jobSalaryField.getText());
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Salary must be a valid number.");
-            return;
-        }
+        double salary = (int) jobSalarySpinner.getValue();
 
         JobPost newJob = new JobPost(
                 jobTitleField.getText(),
@@ -348,14 +330,7 @@ public class JobPortal extends JFrame{
             JOptionPane.showMessageDialog(this, "New job posted successfully");
         }
 
-        // clear fields
-        jobTitleField.setText("");
-        jobTypeBox.setSelectedIndex(0);
-        jobCompanyField.setText("");
-        jobLocationField.setText("");
-        jobDescriptionArea.setText("");
-        jobCategoryBox.setSelectedIndex(0);
-        jobSalaryField.setText("");
+        clearFields();
     }
 
     public static void main(String[] args) {
