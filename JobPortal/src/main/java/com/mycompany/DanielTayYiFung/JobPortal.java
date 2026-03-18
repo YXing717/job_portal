@@ -28,18 +28,16 @@ import java.awt.Component;
 public class JobPortal extends JFrame{
   private CardLayout cardLayout;
   private JPanel mainPanel;
-  
   private JComboBox<JobPost> jobList;
+  private JComboBox<String> jobTypeBox;
+  private JComboBox<String> jobCategoryBox;
   private JTextField jobTitleField;
   private JTextField jobCompanyField;
   private JTextField jobLocationField;
   private JTextArea jobDescriptionArea;
-  private JComboBox<String> jobCategoryBox;
   private JTextField jobSalaryField;
-
   private ArrayList<JobPost> jobs = new ArrayList<>();
   private final String FILE_NAME = "jobs.csv";
-
   private boolean updateMode = false;
   private JPanel jobListPanel;
 
@@ -114,12 +112,20 @@ public class JobPortal extends JFrame{
 
         panel.add(jobListPanel, BorderLayout.NORTH);
 
-        JPanel form = new JPanel(new GridLayout(6, 2, 10, 10));
+        JPanel form = new JPanel(new GridLayout(7, 2, 10, 10));
 
         form.add(new JLabel("Job Title:"));
         jobTitleField = new JTextField();
         form.add(jobTitleField);
 
+        form.add(new JLabel("Job Type:"));
+        jobTypeBox = new JComboBox<>(new String[]{
+            "Select Job Type",
+            "Internship",
+            "Permanent"
+        });
+        form.add(jobTypeBox);
+    
         form.add(new JLabel("Company:"));
         jobCompanyField = new JTextField();
         form.add(jobCompanyField);
@@ -191,19 +197,20 @@ public class JobPortal extends JFrame{
                 }
               
                 String title = data[0];
-                String company = data[1];
-                String location = data[2];
-                String description = data[3];
-                String category = data[4];
+                String type = data[1];
+                String company = data[2];
+                String location = data[3];
+                String description = data[4];
+                String category = data[5];
                 double salary;
 
               try {
-                    salary = Double.parseDouble(data[5]);
+                    salary = Double.parseDouble(data[6]);
                 } catch (NumberFormatException e) {
                     continue; // skip invalid salary
                 }
 
-                jobs.add(new JobPost(title, company, location, description, category, salary));
+                jobs.add(new JobPost(title, type, company, location, description, category, salary));
             }
         } catch (IOException e) {
             JOptionPane.showMessageDialog(this, "jobs.csv not found");
@@ -212,12 +219,13 @@ public class JobPortal extends JFrame{
 
     private boolean saveJobs() {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(FILE_NAME))) {
-          bw.write("Title,Company,Location,Description,Category,Salary");
+          bw.write("Title,Type,Company,Location,Description,Category,Salary");
           bw.newLine();  
           
           for (JobPost job : jobs) {
                 bw.write(
-                  job.getJobTitle() + ","
+                        job.getJobTitle() + ","
+                        + job.getJobType() + ","
                         + job.getJobCompany() + ","
                         + job.getJobLocation() + ","
                         + job.getJobDescription() + ","
@@ -238,6 +246,7 @@ public class JobPortal extends JFrame{
     // utility methods
     private void clearFields() {
         jobTitleField.setText("");
+        jobTypeBox.setSelectedIndex(0);
         jobCompanyField.setText("");
         jobLocationField.setText("");
         jobDescriptionArea.setText("");
@@ -250,6 +259,7 @@ public class JobPortal extends JFrame{
         
         if (job != null) {
             jobTitleField.setText(job.getJobTitle());
+            jobTypeBox.setSelectedItem(job.getJobType());
             jobCompanyField.setText(job.getJobCompany());
             jobLocationField.setText(job.getJobLocation());
             jobDescriptionArea.setText(job.getJobDescription());
@@ -264,6 +274,7 @@ public class JobPortal extends JFrame{
         if (job != null) {
           // required field validation
             if (jobTitleField.getText().trim().isEmpty()
+                    || jobTypeBox.getSelectedIndex() == 0
                     || jobCompanyField.getText().trim().isEmpty()
                     || jobLocationField.getText().trim().isEmpty()
                     || jobDescriptionArea.getText().trim().isEmpty()
@@ -283,7 +294,8 @@ public class JobPortal extends JFrame{
                 return;
             }  
           
-          job.setJobTitle(jobTitleField.getText());
+            job.setJobTitle(jobTitleField.getText());
+            job.setJobType((String) jobTypeBox.getSelectedItem());
             job.setJobCompany(jobCompanyField.getText());
             job.setJobLocation(jobLocationField.getText());
             job.setJobDescription(jobDescriptionArea.getText());
@@ -299,6 +311,7 @@ public class JobPortal extends JFrame{
   // CRUD methods
   public void addJob() {
         if (jobTitleField.getText().trim().isEmpty()
+                || jobTypeBox.getSelectedIndex() == 0
                 || jobCompanyField.getText().trim().isEmpty()
                 || jobLocationField.getText().trim().isEmpty()
                 || jobDescriptionArea.getText().trim().isEmpty()
@@ -319,6 +332,7 @@ public class JobPortal extends JFrame{
 
         JobPost newJob = new JobPost(
                 jobTitleField.getText(),
+                (String) jobTypeBox.getSelectedItem(),
                 jobCompanyField.getText(),
                 jobLocationField.getText(),
                 jobDescriptionArea.getText(),
@@ -336,6 +350,7 @@ public class JobPortal extends JFrame{
 
         // clear fields
         jobTitleField.setText("");
+        jobTypeBox.setSelectedIndex(0);
         jobCompanyField.setText("");
         jobLocationField.setText("");
         jobDescriptionArea.setText("");
