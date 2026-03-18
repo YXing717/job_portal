@@ -3,14 +3,16 @@ package com.mycompany.job_portal;
 public class JobPost {
 
     private String jobTitle;
+    private String jobType;
     private String jobCompany;
     private String jobDescription;
     private String jobLocation;
     private String jobCategory;
     private double jobSalary;
 
-    public JobPost(String jobTitle, String jobCompany, String jobDescription, String jobLocation, String jobCategory, double jobSalary) {
+    public JobPost(String jobTitle, String jobType, String jobCompany, String jobDescription, String jobLocation, String jobCategory, double jobSalary) {
         this.jobTitle = jobTitle;
+        this.jobType = jobType;
         this.jobCompany = jobCompany;
         this.jobDescription = jobDescription;
         this.jobLocation = jobLocation;
@@ -25,6 +27,14 @@ public class JobPost {
 
     public String getJobTitle() {
         return jobTitle;
+    }
+
+    public void setJobType(String jobType) {
+        this.jobType = jobType;
+    }
+    
+    public String getJobType() {
+        return jobType;
     }
 
     public void setJobCompany(String jobCompany) {
@@ -73,6 +83,6 @@ public class JobPost {
     }
 
     public String toFile() {
-        return jobTitle + " | " + jobCompany + " | " + jobLocation + " | " + jobDescription + " | " + jobCategory + " | " + jobSalary;
+        return jobTitle + " | " + jobType + " | " + jobCompany + " | " + jobLocation + " | " + jobDescription + " | " + jobCategory + " | " + jobSalary;
     }
 }
