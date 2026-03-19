@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (inputField.type === 'password') {
             inputField.type = 'text';
             btn.innerHTML = eyeClosedSvg;
-        } else {
+        } else 
             inputField.type = 'password';
             btn.innerHTML = eyeOpenSvg;
         }
