@@ -22,9 +22,25 @@ document.addEventListener('DOMContentLoaded', () => {
             const date = new Date(user.registeredAt);
             dateCell.textContent = date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
 
+            // Action cell
+            const actionCell = document.createElement('td');
+            actionCell.style.textAlign = 'center';
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'delete-btn';
+            deleteBtn.textContent = 'Delete';
+            deleteBtn.onclick = () => {
+                if(confirm(`Are you sure you want to delete ${user.fullName}?`)) {
+                    const updatedUsers = users.filter(u => u.email !== user.email);
+                    localStorage.setItem('registeredUsers', JSON.stringify(updatedUsers));
+                    location.reload();
+                }
+            };
+            actionCell.appendChild(deleteBtn);
+
             row.appendChild(nameCell);
             row.appendChild(emailCell);
             row.appendChild(dateCell);
+            row.appendChild(actionCell);
             
             tableBody.appendChild(row);
         });

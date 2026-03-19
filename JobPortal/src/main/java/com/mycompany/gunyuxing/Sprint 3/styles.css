@@ -119,6 +119,39 @@ input::placeholder {
     color: #94a3b8;
 }
 
+/* Password Visibility Toggle */
+.password-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-wrapper input {
+    padding-right: 60px;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 16px;
+    background: none;
+    border: none;
+    color: #94a3b8;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+}
+
+.toggle-password:hover {
+    color: var(--text-main);
+}
+
+.toggle-password:focus {
+    outline: none;
+}
+
 .error-message {
     color: var(--error-color);
     font-size: 0.75rem;
@@ -257,4 +290,20 @@ tr:last-child td {
 
 tr:hover td {
     background: rgba(255, 255, 255, 0.03);
+}
+
+.delete-btn {
+    background: var(--error-color);
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 500;
+    transition: background 0.2s;
+}
+
+.delete-btn:hover {
+    background: #e11d48;
 }
