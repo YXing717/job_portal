@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Employer Dashboard</title>
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+
+<header>
+    <h1>Employer Dashboard</h1>
+</header>
+
+<div class="controls">
+    <input type="text" placeholder="Search applicant...">
+
+    <select>
+        <option>All Status</option>
+        <option>Pending</option>
+        <option>Reviewed</option>
+        <option>Accepted</option>
+        <option>Rejected</option>
+    </select>
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Position</th>
+            <th>Status</th>
+            <th>Update Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>John</td>
+            <td>Backend Developer</td>
+            <td>Pending</td>
+            <td>
+                <select>
+                    <option>Pending</option>
+                    <option>Reviewed</option>
+                    <option>Accepted</option>
+                    <option>Rejected</option>
+                </select>
+                <button>Update</button>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+</body>
+</html>
