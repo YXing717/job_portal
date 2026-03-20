@@ -10,7 +10,7 @@ public class Story23 {
         String company;
         double estimatedSalary;
         String resumeFile;
-        String status; // NEW
+        String status;
 
         Job(String title, String company, double estimatedSalary, String resumeFile, String status) {
             this.title = title;
@@ -22,8 +22,15 @@ public class Story23 {
     }
 
     // ===================== VALIDATION =====================
-    static boolean isValidText(String input) {
-        return input.matches("^[A-Za-z].*");
+
+    // Allow normal titles OR formats like 3D Designer
+    static boolean isValidTitle(String input) {
+        return input.matches("^[A-Za-z].*") || input.matches("^\\d+[A-Za-z].*");
+    }
+
+    // Must contain at least one letter (allows 7-Eleven, 3M)
+    static boolean isValidCompany(String input) {
+        return input.matches(".*[A-Za-z].*");
     }
 
     static boolean isValidSalary(double salary) {
@@ -44,7 +51,9 @@ public class Story23 {
         appliedJobs.add(new Job("Data Analyst", "Shopee", 4200, "resume_shopee.pdf", "Pending"));
         appliedJobs.add(new Job("System Developer", "Intel", 4800, "resume_intel.pdf", "Pending"));
         appliedJobs.add(new Job("Web Developer", "Grab", 4500, "resume_grab.pdf", "Pending"));
-        appliedJobs.add(new Job("AI Engineer", "Microsoft", 6000, "resume_ai.pdf", "On Review")); //locked
+        appliedJobs.add(new Job("AI Engineer", "Microsoft", 6000, "resume_ai.pdf", "On Review"));
+        appliedJobs.add(new Job("3D Designer", "3M", 4700, "resume_3d.pdf", "Pending"));
+        appliedJobs.add(new Job("Retail Assistant", "7-Eleven", 3000, "resume_retail.pdf", "On Review"));
 
         String seekerName = "Demo User";
 
@@ -90,7 +99,6 @@ public class Story23 {
 
                     Job job = appliedJobs.get(editIndex - 1);
 
-                    // STATUS CHECK
                     if (job.status.equalsIgnoreCase("On Review")) {
                         System.out.println("This application is under review and cannot be modified.");
                         break;
@@ -101,7 +109,6 @@ public class Story23 {
                     boolean salaryChanged = false;
                     boolean resumeChanged = false;
 
-                    // BEFORE
                     System.out.println("\n----- CURRENT APPLICATION -----");
                     System.out.println("Title   : " + job.title);
                     System.out.println("Company : " + job.company);
@@ -118,8 +125,8 @@ public class Story23 {
 
                         if (newTitle.isEmpty()) break;
 
-                        if (!isValidText(newTitle)) {
-                            System.out.println("Invalid title.");
+                        if (!isValidTitle(newTitle)) {
+                            System.out.println("Invalid title. Must start with a letter or valid format like 3D.");
                         } else {
                             job.title = newTitle;
                             titleChanged = true;
@@ -134,8 +141,8 @@ public class Story23 {
 
                         if (newCompany.isEmpty()) break;
 
-                        if (!isValidText(newCompany)) {
-                            System.out.println("Invalid company.");
+                        if (!isValidCompany(newCompany)) {
+                            System.out.println("Invalid company. Must contain at least one letter.");
                         } else {
                             job.company = newCompany;
                             companyChanged = true;
@@ -174,7 +181,7 @@ public class Story23 {
                         if (newResume.isEmpty()) break;
 
                         if (!isValidResume(newResume)) {
-                            System.out.println("Invalid file type.");
+                            System.out.println("Invalid file type. Only PDF, DOC, DOCX, JPG, PNG allowed.");
                         } else {
                             job.resumeFile = newResume;
                             resumeChanged = true;
@@ -182,7 +189,6 @@ public class Story23 {
                         }
                     }
 
-                    // AFTER
                     System.out.println("\n----- UPDATED APPLICATION -----");
                     System.out.println("Title   : " + job.title);
                     System.out.println("Company : " + job.company);
@@ -190,7 +196,6 @@ public class Story23 {
                     System.out.println("Resume  : " + job.resumeFile);
                     System.out.println("Status  : " + job.status);
 
-                    // UAT
                     System.out.println("\n===== USER ACCEPTANCE RESULT =====");
 
                     if (!titleChanged && !companyChanged && !salaryChanged && !resumeChanged) {
