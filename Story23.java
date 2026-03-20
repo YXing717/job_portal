@@ -10,12 +10,14 @@ public class Story23 {
         String company;
         double estimatedSalary;
         String resumeFile;
+        String status; // NEW
 
-        Job(String title, String company, double estimatedSalary, String resumeFile) {
+        Job(String title, String company, double estimatedSalary, String resumeFile, String status) {
             this.title = title;
             this.company = company;
             this.estimatedSalary = estimatedSalary;
             this.resumeFile = resumeFile;
+            this.status = status;
         }
     }
 
@@ -38,11 +40,11 @@ public class Story23 {
 
         // ===================== DEMO DATA =====================
         ArrayList<Job> appliedJobs = new ArrayList<>();
-        appliedJobs.add(new Job("Software Engineer", "Google", 5000, "resume_google.pdf"));
-        appliedJobs.add(new Job("Data Analyst", "Shopee", 4200, "resume_shopee.pdf"));
-        appliedJobs.add(new Job("System Developer", "Intel", 4800, "resume_intel.pdf"));
-        appliedJobs.add(new Job("Web Developer", "Grab", 4500, "resume_grab.pdf"));
-        appliedJobs.add(new Job("AI Engineer", "Microsoft", 6000, "resume_ai.pdf"));
+        appliedJobs.add(new Job("Software Engineer", "Google", 5000, "resume_google.pdf", "Pending"));
+        appliedJobs.add(new Job("Data Analyst", "Shopee", 4200, "resume_shopee.pdf", "Pending"));
+        appliedJobs.add(new Job("System Developer", "Intel", 4800, "resume_intel.pdf", "Pending"));
+        appliedJobs.add(new Job("Web Developer", "Grab", 4500, "resume_grab.pdf", "Pending"));
+        appliedJobs.add(new Job("AI Engineer", "Microsoft", 6000, "resume_ai.pdf", "On Review")); //locked
 
         String seekerName = "Demo User";
 
@@ -71,29 +73,29 @@ public class Story23 {
                 case 2:
                     displayJobs(appliedJobs, seekerName);
 
-                    if (appliedJobs.isEmpty()) {
-                        System.out.println("No applications available to edit.");
-                        break;
-                    }
-
                     System.out.print("Enter number to edit: ");
 
                     int editIndex;
                     try {
                         editIndex = Integer.parseInt(sc.nextLine());
                     } catch (NumberFormatException e) {
-                        System.out.println("Invalid input. Please enter a valid number.");
+                        System.out.println("Invalid input.");
                         break;
                     }
 
                     if (editIndex < 1 || editIndex > appliedJobs.size()) {
-                        System.out.println("Invalid selection. Please choose a valid job number.");
+                        System.out.println("Invalid selection.");
                         break;
                     }
 
                     Job job = appliedJobs.get(editIndex - 1);
 
-                    // ===================== CHANGE TRACKING =====================
+                    // STATUS CHECK
+                    if (job.status.equalsIgnoreCase("On Review")) {
+                        System.out.println("This application is under review and cannot be modified.");
+                        break;
+                    }
+
                     boolean titleChanged = false;
                     boolean companyChanged = false;
                     boolean salaryChanged = false;
@@ -105,10 +107,11 @@ public class Story23 {
                     System.out.println("Company : " + job.company);
                     System.out.println("Salary  : RM " + job.estimatedSalary);
                     System.out.println("Resume  : " + job.resumeFile);
+                    System.out.println("Status  : " + job.status);
 
                     System.out.println("\n(Press ENTER to keep old value)");
 
-                    // ===================== TITLE =====================
+                    // TITLE
                     while (true) {
                         System.out.print("New Job Title: ");
                         String newTitle = sc.nextLine();
@@ -116,7 +119,7 @@ public class Story23 {
                         if (newTitle.isEmpty()) break;
 
                         if (!isValidText(newTitle)) {
-                            System.out.println("Invalid title. Must start with a letter.");
+                            System.out.println("Invalid title.");
                         } else {
                             job.title = newTitle;
                             titleChanged = true;
@@ -124,7 +127,7 @@ public class Story23 {
                         }
                     }
 
-                    // ===================== COMPANY =====================
+                    // COMPANY
                     while (true) {
                         System.out.print("New Company: ");
                         String newCompany = sc.nextLine();
@@ -132,7 +135,7 @@ public class Story23 {
                         if (newCompany.isEmpty()) break;
 
                         if (!isValidText(newCompany)) {
-                            System.out.println("Invalid company name. Must start with a letter.");
+                            System.out.println("Invalid company.");
                         } else {
                             job.company = newCompany;
                             companyChanged = true;
@@ -140,7 +143,7 @@ public class Story23 {
                         }
                     }
 
-                    // ===================== SALARY =====================
+                    // SALARY
                     while (true) {
                         System.out.print("New Salary: ");
                         String salaryInput = sc.nextLine();
@@ -158,12 +161,12 @@ public class Story23 {
                                 break;
                             }
 
-                        } catch (NumberFormatException e) {
-                            System.out.println("Invalid salary format.");
+                        } catch (Exception e) {
+                            System.out.println("Invalid salary.");
                         }
                     }
 
-                    // ===================== RESUME =====================
+                    // RESUME
                     while (true) {
                         System.out.print("New Resume File: ");
                         String newResume = sc.nextLine();
@@ -171,7 +174,7 @@ public class Story23 {
                         if (newResume.isEmpty()) break;
 
                         if (!isValidResume(newResume)) {
-                            System.out.println("Invalid file. Only PDF, DOC, DOCX, JPG, PNG allowed.");
+                            System.out.println("Invalid file type.");
                         } else {
                             job.resumeFile = newResume;
                             resumeChanged = true;
@@ -185,15 +188,15 @@ public class Story23 {
                     System.out.println("Company : " + job.company);
                     System.out.println("Salary  : RM " + job.estimatedSalary);
                     System.out.println("Resume  : " + job.resumeFile);
+                    System.out.println("Status  : " + job.status);
 
-                    // ===================== UAT RESULT =====================
+                    // UAT
                     System.out.println("\n===== USER ACCEPTANCE RESULT =====");
 
                     if (!titleChanged && !companyChanged && !salaryChanged && !resumeChanged) {
                         System.out.println("No changes were made.");
                     } else {
                         System.out.println("Updated fields:");
-
                         if (titleChanged) System.out.println("- Job Title updated");
                         if (companyChanged) System.out.println("- Company updated");
                         if (salaryChanged) System.out.println("- Salary updated");
@@ -208,7 +211,7 @@ public class Story23 {
                     return;
 
                 default:
-                    System.out.println("Invalid option. Please choose 1-3.");
+                    System.out.println("Invalid option.");
             }
         }
     }
@@ -217,20 +220,15 @@ public class Story23 {
     static void displayJobs(ArrayList<Job> jobs, String seekerName) {
         System.out.println("\n===== Applied Jobs for " + seekerName + " =====");
 
-        if (jobs.isEmpty()) {
-            System.out.println("No applications found.");
-            return;
-        }
+        System.out.printf("%-5s %-20s %-20s %-10s %-20s %-15s%n",
+                "No", "Job Title", "Company", "Salary", "Resume", "Status");
 
-        System.out.printf("%-5s %-20s %-20s %-10s %-20s%n",
-                "No", "Job Title", "Company", "Salary", "Resume");
-
-        System.out.println("---------------------------------------------------------------------");
+        System.out.println("--------------------------------------------------------------------------------");
 
         for (int i = 0; i < jobs.size(); i++) {
             Job j = jobs.get(i);
-            System.out.printf("%-5d %-20s %-20s %-10.2f %-20s%n",
-                    i + 1, j.title, j.company, j.estimatedSalary, j.resumeFile);
+            System.out.printf("%-5d %-20s %-20s %-10.2f %-20s %-15s%n",
+                    i + 1, j.title, j.company, j.estimatedSalary, j.resumeFile, j.status);
         }
     }
 }
