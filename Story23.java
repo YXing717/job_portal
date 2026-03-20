@@ -19,6 +19,19 @@ public class Story23 {
         }
     }
 
+    // ===================== VALIDATION =====================
+    static boolean isValidText(String input) {
+        return input.matches("^[A-Za-z].*");
+    }
+
+    static boolean isValidSalary(double salary) {
+        return salary >= 1500;
+    }
+
+    static boolean isValidResume(String file) {
+        return file.toLowerCase().matches(".*\\.(pdf|doc|docx|jpg|png)$");
+    }
+
     public static void main(String[] args) {
 
         Scanner sc = new Scanner(System.in);
@@ -51,12 +64,10 @@ public class Story23 {
 
             switch (option) {
 
-                // ===================== VIEW =====================
                 case 1:
                     displayJobs(appliedJobs, seekerName);
                     break;
 
-                // ===================== EDIT =====================
                 case 2:
                     displayJobs(appliedJobs, seekerName);
 
@@ -82,6 +93,12 @@ public class Story23 {
 
                     Job job = appliedJobs.get(editIndex - 1);
 
+                    // ===================== CHANGE TRACKING =====================
+                    boolean titleChanged = false;
+                    boolean companyChanged = false;
+                    boolean salaryChanged = false;
+                    boolean resumeChanged = false;
+
                     // BEFORE
                     System.out.println("\n----- CURRENT APPLICATION -----");
                     System.out.println("Title   : " + job.title);
@@ -91,42 +108,75 @@ public class Story23 {
 
                     System.out.println("\n(Press ENTER to keep old value)");
 
-                    // EDIT TITLE
-                    System.out.print("New Job Title: ");
-                    String newTitle = sc.nextLine();
-                    if (!newTitle.isEmpty()) {
-                        job.title = newTitle;
-                    }
+                    // ===================== TITLE =====================
+                    while (true) {
+                        System.out.print("New Job Title: ");
+                        String newTitle = sc.nextLine();
 
-                    // EDIT COMPANY
-                    System.out.print("New Company: ");
-                    String newCompany = sc.nextLine();
-                    if (!newCompany.isEmpty()) {
-                        job.company = newCompany;
-                    }
+                        if (newTitle.isEmpty()) break;
 
-                    // EDIT SALARY
-                    System.out.print("New Salary: ");
-                    String salaryInput = sc.nextLine();
-
-                    if (!salaryInput.isEmpty()) {
-                        try {
-                            double newSalary = Double.parseDouble(salaryInput);
-                            if (newSalary < 0) {
-                                System.out.println("Salary cannot be negative. Keeping old value.");
-                            } else {
-                                job.estimatedSalary = newSalary;
-                            }
-                        } catch (NumberFormatException e) {
-                            System.out.println("Invalid salary format. Keeping old value.");
+                        if (!isValidText(newTitle)) {
+                            System.out.println("Invalid title. Must start with a letter.");
+                        } else {
+                            job.title = newTitle;
+                            titleChanged = true;
+                            break;
                         }
                     }
 
-                    // EDIT RESUME
-                    System.out.print("New Resume File: ");
-                    String newResume = sc.nextLine();
-                    if (!newResume.isEmpty()) {
-                        job.resumeFile = newResume;
+                    // ===================== COMPANY =====================
+                    while (true) {
+                        System.out.print("New Company: ");
+                        String newCompany = sc.nextLine();
+
+                        if (newCompany.isEmpty()) break;
+
+                        if (!isValidText(newCompany)) {
+                            System.out.println("Invalid company name. Must start with a letter.");
+                        } else {
+                            job.company = newCompany;
+                            companyChanged = true;
+                            break;
+                        }
+                    }
+
+                    // ===================== SALARY =====================
+                    while (true) {
+                        System.out.print("New Salary: ");
+                        String salaryInput = sc.nextLine();
+
+                        if (salaryInput.isEmpty()) break;
+
+                        try {
+                            double newSalary = Double.parseDouble(salaryInput);
+
+                            if (!isValidSalary(newSalary)) {
+                                System.out.println("Salary must be at least RM1500.");
+                            } else {
+                                job.estimatedSalary = newSalary;
+                                salaryChanged = true;
+                                break;
+                            }
+
+                        } catch (NumberFormatException e) {
+                            System.out.println("Invalid salary format.");
+                        }
+                    }
+
+                    // ===================== RESUME =====================
+                    while (true) {
+                        System.out.print("New Resume File: ");
+                        String newResume = sc.nextLine();
+
+                        if (newResume.isEmpty()) break;
+
+                        if (!isValidResume(newResume)) {
+                            System.out.println("Invalid file. Only PDF, DOC, DOCX, JPG, PNG allowed.");
+                        } else {
+                            job.resumeFile = newResume;
+                            resumeChanged = true;
+                            break;
+                        }
                     }
 
                     // AFTER
@@ -136,14 +186,22 @@ public class Story23 {
                     System.out.println("Salary  : RM " + job.estimatedSalary);
                     System.out.println("Resume  : " + job.resumeFile);
 
-                    // UAT RESULT
+                    // ===================== UAT RESULT =====================
                     System.out.println("\n===== USER ACCEPTANCE RESULT =====");
-                    System.out.println("Application edited successfully.");
-                    System.out.println("Resume updated.");
+
+                    if (!titleChanged && !companyChanged && !salaryChanged && !resumeChanged) {
+                        System.out.println("No changes were made.");
+                    } else {
+                        System.out.println("Updated fields:");
+
+                        if (titleChanged) System.out.println("- Job Title updated");
+                        if (companyChanged) System.out.println("- Company updated");
+                        if (salaryChanged) System.out.println("- Salary updated");
+                        if (resumeChanged) System.out.println("- Resume updated");
+                    }
 
                     break;
 
-                // ===================== EXIT =====================
                 case 3:
                     System.out.println("Demo ended.");
                     sc.close();
