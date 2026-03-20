@@ -88,19 +88,19 @@ public class Story23 {
                     try {
                         editIndex = Integer.parseInt(sc.nextLine());
                     } catch (NumberFormatException e) {
-                        System.out.println("Invalid input.");
+                        System.out.println("Invalid input. Please enter a valid number.");
                         break;
                     }
 
                     if (editIndex < 1 || editIndex > appliedJobs.size()) {
-                        System.out.println("Invalid selection.");
+                        System.out.println("Invalid selection. Please choose a valid application number.");
                         break;
                     }
 
                     Job job = appliedJobs.get(editIndex - 1);
 
                     if (job.status.equalsIgnoreCase("On Review")) {
-                        System.out.println("This application is under review and cannot be modified.");
+                        System.out.println("This application is currently under review and cannot be modified.");
                         break;
                     }
 
@@ -169,7 +169,7 @@ public class Story23 {
                             }
 
                         } catch (Exception e) {
-                            System.out.println("Invalid salary.");
+                            System.out.println("Invalid salary format. Please enter a number.");
                         }
                     }
 
@@ -196,7 +196,8 @@ public class Story23 {
                     System.out.println("Resume  : " + job.resumeFile);
                     System.out.println("Status  : " + job.status);
 
-                    System.out.println("\n===== USER ACCEPTANCE RESULT =====");
+                    System.out.println("\n----------------------------------------");
+                    System.out.println("===== UPDATE RESULT =====");
 
                     if (!titleChanged && !companyChanged && !salaryChanged && !resumeChanged) {
                         System.out.println("No changes were made.");
