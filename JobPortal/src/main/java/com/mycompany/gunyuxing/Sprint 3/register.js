@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('registrationForm');
     const successOverlay = document.getElementById('successOverlay');
-    
+
     // Form fields
     const fullName = document.getElementById('fullName');
     const email = document.getElementById('email');
@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (inputField.type === 'password') {
             inputField.type = 'text';
             btn.innerHTML = eyeClosedSvg;
-        } else 
+        } else {
             inputField.type = 'password';
             btn.innerHTML = eyeOpenSvg;
         }
