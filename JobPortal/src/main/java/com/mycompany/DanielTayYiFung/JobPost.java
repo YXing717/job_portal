@@ -9,8 +9,9 @@ public class JobPost {
     private String jobLocation;
     private String jobCategory;
     private double jobSalary;
+    private String closingDate;
 
-    public JobPost(String jobTitle, String jobType, String jobCompany, String jobDescription, String jobLocation, String jobCategory, double jobSalary) {
+    public JobPost(String jobTitle, String jobType, String jobCompany, String jobDescription, String jobLocation, String jobCategory, double jobSalary, String closingDate) {
         this.jobTitle = jobTitle;
         this.jobType = jobType;
         this.jobCompany = jobCompany;
@@ -18,6 +19,7 @@ public class JobPost {
         this.jobLocation = jobLocation;
         this.jobCategory = jobCategory;
         this.jobSalary = jobSalary;
+        this.closingDate = closingDate;
     }
 
     // setter & getter
@@ -76,13 +78,21 @@ public class JobPost {
     public double getJobSalary() {
         return jobSalary;
     }
+    
+    public void setClosingDate(String closingDate) {
+        this.closingDate = closingDate;
+    }
+
+    public String getClosingDate() {
+        return closingDate;
+    }
 
     @Override
     public String toString() {
-        return jobTitle + " - " + jobCompany;
+        return jobTitle + " - " + jobCompany + " (" + jobType + ")";
     }
 
     public String toFile() {
-        return jobTitle + " | " + jobType + " | " + jobCompany + " | " + jobLocation + " | " + jobDescription + " | " + jobCategory + " | " + jobSalary;
+        return jobTitle + " | " + jobType + " | " + jobCompany + " | " + jobLocation + " | " + jobDescription + " | " + jobCategory + " | " + jobSalary + " | " + closingDate;
     }
 }
