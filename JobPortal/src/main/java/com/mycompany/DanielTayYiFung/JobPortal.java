@@ -5,7 +5,10 @@ import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -27,6 +30,8 @@ import java.awt.CardLayout;
 import java.awt.Dimension;
 import java.awt.Component;
 
+import com.toedter.calendar.JDateChooser;
+
 public class JobPortal extends JFrame{
   private CardLayout cardLayout;
   private JPanel mainPanel;
@@ -38,7 +43,9 @@ public class JobPortal extends JFrame{
   private JTextField jobLocationField;
   private JTextArea jobDescriptionArea;
   private JSpinner jobSalarySpinner;
+  private JDateChooser closingDateChooser;
   private ArrayList<JobPost> jobs = new ArrayList<>();
+  
   private final String FILE_NAME = "jobs.csv";
   private boolean updateMode = false;
   private JPanel jobListPanel;
@@ -158,6 +165,11 @@ public class JobPortal extends JFrame{
         );
         form.add(jobSalarySpinner);
 
+        form.add(new JLabel("Closing Date:"));
+        closingDateChooser = new JDateChooser();
+        closingDateChooser.setDateFormatString("yyyy-MM-dd");
+        form.add(closingDateChooser);
+    
         panel.add(form, BorderLayout.CENTER);
 
         JPanel buttons = new JPanel();
@@ -188,14 +200,14 @@ public class JobPortal extends JFrame{
         return panel;
     }
 
-  // file methods
+  // ---------------FILE METHODS-------------------
   private void loadJobs() {
         try (BufferedReader br = new BufferedReader(new FileReader(FILE_NAME))) {
             String line;
             while ((line = br.readLine()) != null) {
                 String[] data = line.split(",");
               
-                if (data.length < 7) {
+                if (data.length < 8) {
                     continue; // skip invalid line
                 }
               
@@ -206,8 +218,9 @@ public class JobPortal extends JFrame{
                 String description = data[4];
                 String category = data[5];
                 double salary = Double.parseDouble(data[6]);
+                String closingDate = data[7].replace("\"", "");
 
-                jobs.add(new JobPost(title, type, company, location, description, category, salary));
+                jobs.add(new JobPost(title, type, company, location, description, category, salary, closingDate));
             }
         } catch (IOException e) {
             JOptionPane.showMessageDialog(this, "jobs.csv not found");
@@ -227,7 +240,8 @@ public class JobPortal extends JFrame{
                         + "\"" + job.getJobLocation() + "\","
                         + "\"" + job.getJobDescription() + "\","
                         + "\"" + job.getJobCategory() + "\","
-                        + String.format("%.2f", job.getJobSalary())
+                        + String.format("%.2f", job.getJobSalary()) + ","
+                        + "\"" + job.getClosingDate() + "\""
                 );
                 bw.newLine();
             }
@@ -239,8 +253,9 @@ public class JobPortal extends JFrame{
           return false;
         }
     }
+    // ----------------------------------------------
 
-    // utility methods
+    // --------------UTILITY METHODS-----------------
     private void clearFields() {
         jobTitleField.setText("");
         jobTypeBox.setSelectedIndex(0);
@@ -249,6 +264,7 @@ public class JobPortal extends JFrame{
         jobDescriptionArea.setText("");
         jobCategoryBox.setSelectedIndex(0);
         jobSalarySpinner.setValue(1000);
+        closingDateChooser.setDate(null);
     }
   
     private void displaySelectedJob() {
@@ -262,9 +278,18 @@ public class JobPortal extends JFrame{
             jobDescriptionArea.setText(job.getJobDescription());
             jobCategoryBox.setSelectedItem(job.getJobCategory());
             jobSalarySpinner.setValue((int) job.getJobSalary());
+            try {
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                Date date = sdf.parse(job.getClosingDate());
+                closingDateChooser.setDate(date);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
+    // ------------------------------------------------
 
+    // ----------------CRUD METHODS--------------------
     private void updateJob() {
         JobPost job = (JobPost) jobList.getSelectedItem();
         
@@ -282,6 +307,15 @@ public class JobPortal extends JFrame{
             }
 
             double salary = (int) jobSalarySpinner.getValue();
+            Date selectedDate = closingDateChooser.getDate();
+
+            if (selectedDate == null) {
+                JOptionPane.showMessageDialog(this, "Closing date is required.");
+                return;
+            }
+
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            String closingDate = sdf.format(selectedDate);
           
             job.setJobTitle(jobTitleField.getText());
             job.setJobType((String) jobTypeBox.getSelectedItem());
@@ -290,6 +324,7 @@ public class JobPortal extends JFrame{
             job.setJobDescription(jobDescriptionArea.getText());
             job.setJobCategory((String) jobCategoryBox.getSelectedItem());
             job.setJobSalary(salary);
+            job.setClosingDate(closingDate);
 
             if (saveJobs()) {
                 JOptionPane.showMessageDialog(this, "Job updated successfully!");
@@ -297,7 +332,6 @@ public class JobPortal extends JFrame{
         }
     }
 
-  // CRUD methods
   public void addJob() {
         if (jobTitleField.getText().trim().isEmpty()
                 || jobTypeBox.getSelectedIndex() == 0
@@ -311,7 +345,16 @@ public class JobPortal extends JFrame{
         }
 
         double salary = (int) jobSalarySpinner.getValue();
+        Date selectedDate = closingDateChooser.getDate();
 
+        if (selectedDate == null) {
+            JOptionPane.showMessageDialog(this, "Closing date is required.");
+            return;
+        }
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String closingDate = sdf.format(selectedDate);
+    
         JobPost newJob = new JobPost(
                 jobTitleField.getText(),
                 (String) jobTypeBox.getSelectedItem(),
@@ -319,20 +362,20 @@ public class JobPortal extends JFrame{
                 jobLocationField.getText(),
                 jobDescriptionArea.getText(),
                 (String) jobCategoryBox.getSelectedItem(),
-                salary
+                salary,
+                closingDate
         );
 
         jobs.add(newJob);
-
         jobList.addItem(newJob);
 
         if (saveJobs()) {
             JOptionPane.showMessageDialog(this, "New job posted successfully");
         }
-
         clearFields();
     }
-
+    // ----------------------------------------------
+  
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> new JobPortal().setVisible(true));
     }
