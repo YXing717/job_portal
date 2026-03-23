@@ -325,6 +325,14 @@ public class JobPortal extends JFrame{
                 JOptionPane.showMessageDialog(this, "Closing date is required.");
                 return;
             }
+            // prevent past dates
+            LocalDate today = LocalDate.now();
+            LocalDate closing = selectedDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+            if (closing.isBefore(today)) {
+                JOptionPane.showMessageDialog(this, "Closing date cannot be in the past.");
+                return;
+            }
 
             SimpleDateFormat sdf = new SimpleDateFormat("d/M/yyyy");
             String closingDate = sdf.format(selectedDate);
@@ -352,6 +360,14 @@ public class JobPortal extends JFrame{
 
         if (selectedDate == null) {
             JOptionPane.showMessageDialog(this, "Closing date is required.");
+            return;
+        }
+        // prevent past dates
+        LocalDate today = LocalDate.now();
+        LocalDate closing = selectedDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+        if (closing.isBefore(today)) {
+            JOptionPane.showMessageDialog(this, "Closing date cannot be in the past.");
             return;
         }
 
