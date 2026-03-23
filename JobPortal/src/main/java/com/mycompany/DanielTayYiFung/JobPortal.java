@@ -10,25 +10,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
-import javax.swing.BoxLayout;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
-
-import java.awt.BorderLayout;
-import java.awt.GridLayout;
-import java.awt.CardLayout;
-import java.awt.Dimension;
-import java.awt.Component;
+import javax.swing.*;
+import java.awt.*;
 
 import com.toedter.calendar.JDateChooser;
 
@@ -112,13 +95,33 @@ public class JobPortal extends JFrame{
     }
 
   private JPanel createFormPanel() {
-
         JPanel panel = new JPanel(new BorderLayout());
-
         jobListPanel = new JPanel(new BorderLayout());
         jobList = new JComboBox<>(jobs.toArray(new JobPost[0]));
-        jobListPanel.add(jobList, BorderLayout.CENTER);
+        jobList.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof JobPost job) {
+                    if (job.isExpired()) {
+                        setForeground(Color.RED); // CLOSED jobs in red
+                    } else {
+                        setForeground(Color.BLACK); // OPEN jobs normal
+                    }
+                }
+                return this;
+            }
+        });
 
+        jobList.addActionListener(e -> {
+            JobPost selected = (JobPost) jobList.getSelectedItem();
+            if (selected != null && selected.isExpired()) {
+                JOptionPane.showMessageDialog(this, "This job is closed and cannot be selected.");
+                jobList.setSelectedIndex(-1); // reset selection
+            }
+        });
+    
+        jobListPanel.add(jobList, BorderLayout.CENTER);
         panel.add(jobListPanel, BorderLayout.NORTH);
 
         JPanel form = new JPanel(new GridLayout(7, 2, 10, 10));
@@ -204,8 +207,10 @@ public class JobPortal extends JFrame{
   private void loadJobs() {
         try (BufferedReader br = new BufferedReader(new FileReader(FILE_NAME))) {
             String line;
+            br.readLine();
+          
             while ((line = br.readLine()) != null) {
-                String[] data = line.split(",");
+                String[] data = line.split(",(?=(?:[^"]*"[^"]*")*[^"]*$)");
               
                 if (data.length < 8) {
                     continue; // skip invalid line
@@ -279,7 +284,7 @@ public class JobPortal extends JFrame{
             jobCategoryBox.setSelectedItem(job.getJobCategory());
             jobSalarySpinner.setValue((int) job.getJobSalary());
             try {
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                SimpleDateFormat sdf = new SimpleDateFormat("d/M/yyyy");
                 Date date = sdf.parse(job.getClosingDate());
                 closingDateChooser.setDate(date);
             } catch (Exception e) {
@@ -292,7 +297,11 @@ public class JobPortal extends JFrame{
     // ----------------CRUD METHODS--------------------
     private void updateJob() {
         JobPost job = (JobPost) jobList.getSelectedItem();
-        
+        if (job.isExpired()) {
+            JOptionPane.showMessageDialog(this, "This job is already closed and cannot be updated.");
+            return;
+        }
+      
         if (job != null) {
           // required field validation
             if (jobTitleField.getText().trim().isEmpty()
@@ -314,7 +323,7 @@ public class JobPortal extends JFrame{
                 return;
             }
 
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            SimpleDateFormat sdf = new SimpleDateFormat("d/M/yyyy");
             String closingDate = sdf.format(selectedDate);
           
             job.setJobTitle(jobTitleField.getText());
@@ -352,7 +361,7 @@ public class JobPortal extends JFrame{
             return;
         }
 
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat sdf = new SimpleDateFormat("d/M/yyyy");
         String closingDate = sdf.format(selectedDate);
     
         JobPost newJob = new JobPost(
