@@ -292,6 +292,19 @@ public class JobPortal extends JFrame{
             }
         }
     }
+
+    private void fieldValidation() {
+        if (jobTitleField.getText().trim().isEmpty()
+                || jobTypeBox.getSelectedIndex() == 0
+                || jobCompanyField.getText().trim().isEmpty()
+                || jobLocationField.getText().trim().isEmpty()
+                || jobDescriptionArea.getText().trim().isEmpty()
+                || jobCategoryBox.getSelectedIndex() == 0) {
+
+            JOptionPane.showMessageDialog(this, "All fields are required.");
+            return;
+        }
+    }
     // ------------------------------------------------
 
     // ----------------CRUD METHODS--------------------
@@ -303,17 +316,7 @@ public class JobPortal extends JFrame{
         }
       
         if (job != null) {
-          // required field validation
-            if (jobTitleField.getText().trim().isEmpty()
-                    || jobTypeBox.getSelectedIndex() == 0
-                    || jobCompanyField.getText().trim().isEmpty()
-                    || jobLocationField.getText().trim().isEmpty()
-                    || jobDescriptionArea.getText().trim().isEmpty()
-                    || jobCategoryBox.getSelectedIndex() == 0) {
-
-                JOptionPane.showMessageDialog(this, "All fields are required.");
-                return;
-            }
+            fieldValidation();
 
             double salary = (int) jobSalarySpinner.getValue();
             Date selectedDate = closingDateChooser.getDate();
@@ -342,16 +345,7 @@ public class JobPortal extends JFrame{
     }
 
   public void addJob() {
-        if (jobTitleField.getText().trim().isEmpty()
-                || jobTypeBox.getSelectedIndex() == 0
-                || jobCompanyField.getText().trim().isEmpty()
-                || jobLocationField.getText().trim().isEmpty()
-                || jobDescriptionArea.getText().trim().isEmpty()
-                || jobCategoryBox.getSelectedIndex() == 0) {
-
-            JOptionPane.showMessageDialog(this, "All fields are required.");
-            return;
-        }
+        fieldValidation();
 
         double salary = (int) jobSalarySpinner.getValue();
         Date selectedDate = closingDateChooser.getDate();
