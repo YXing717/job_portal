@@ -1,5 +1,7 @@
 package com.mycompany.job_portal;
 
+import java.time.LocalDate;
+
 public class JobPost {
 
     private String jobTitle;
@@ -89,10 +91,13 @@ public class JobPost {
 
     @Override
     public String toString() {
-        return jobTitle + " - " + jobCompany + " (" + jobType + ")";
+        String status = isExpired() ? "CLOSED" : "OPEN";
+        return jobTitle + " - " + jobCompany + " (" + jobType + ") [" + status + "]";
     }
 
-    public String toFile() {
-        return jobTitle + " | " + jobType + " | " + jobCompany + " | " + jobLocation + " | " + jobDescription + " | " + jobCategory + " | " + jobSalary + " | " + closingDate;
+    public boolean isExpired() {
+        LocalDate today = LocalDate.now();
+        LocalDate closing = LocalDate.parse(closingDate);
+        return today.isAfter(closing);
     }
 }
