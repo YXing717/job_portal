@@ -97,7 +97,22 @@ public class JobPost {
 
     public boolean isExpired() {
         LocalDate today = LocalDate.now();
-        LocalDate closing = LocalDate.parse(closingDate);
+        LocalDate closing = null;
+        DateTimeFormatter[] formats = {
+                DateTimeFormatter.ofPattern("d/M/yyyy")
+        };
+
+        for (DateTimeFormatter fmt : formats) {
+            try {
+                closing = LocalDate.parse(closingDate, fmt);
+                break;
+            } catch (Exception ignored) {}
+        }
+
+        if (closing == null) {
+            System.err.println("Invalid closing date: " + closingDate);
+            return false;
+        }
         return today.isAfter(closing);
     }
 }
