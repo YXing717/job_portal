@@ -2,18 +2,17 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package TanJackXin;
 
+package TanJackXin;
 
 import java.util.ArrayList;
 import java.util.Scanner;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
+
 /**
  *
  * @author jackxin
  */
+
 public class Story24 {
 
     // ===================== Job Class =====================
@@ -21,178 +20,220 @@ public class Story24 {
         String title;
         String company;
         double estimatedSalary;
-        LocalDate applyDate;
+        String resumeFile;
+        String status;
 
-        Job(String title, String company, double estimatedSalary) {
+        Job(String title, String company, double estimatedSalary, String resumeFile) {
             this.title = title;
             this.company = company;
             this.estimatedSalary = estimatedSalary;
-            this.applyDate = LocalDate.now();
-        }
-
-        @Override
-        public String toString() {
-            return title + " at " + company + " (RM " + estimatedSalary + ")";
+            this.resumeFile = resumeFile;
+            this.status = "Applied";
         }
     }
 
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        ArrayList<Job> appliedJobs = new ArrayList<>();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    // ===================== VALIDATION =====================
+    static boolean isValidTitle(String input) {
+        return input.matches("^[A-Za-z].*") || input.matches("^\\d+[A-Za-z].*");
+    }
 
-        // Prompt for job seeker name
-        System.out.println("===============================================");
-        System.out.println("      JOB APPLICATION TRACKING SYSTEM");
-        System.out.println("===============================================");
-        System.out.print("Enter your name: ");
-        String seekerName = sc.nextLine();
+    static boolean isValidCompany(String input) {
+        return input.matches(".*[A-Za-z].*");
+    }
+
+    static boolean isValidSalary(double salary) {
+        return salary >= 1500;
+    }
+
+    static boolean isValidResume(String file) {
+        return file.toLowerCase().matches(".*\\.(pdf|doc|docx|jpg|png)$");
+    }
+
+    // ===================== Job Seeker =====================
+    static class JobSeeker {
+        ArrayList<Job> appliedJobs = new ArrayList<>();
+
+        void applyJob(Job job) {
+            appliedJobs.add(job);
+            System.out.println("Application submitted successfully!");
+        }
+
+        void addDemoJob(Job job) {
+            appliedJobs.add(job);
+        }
+
+        void viewJobs() {
+            System.out.println("\n===== Applied Jobs =====");
+
+            if (appliedJobs.isEmpty()) {
+                System.out.println("No applications found.");
+                return;
+            }
+
+            System.out.printf("%-5s %-20s %-20s %-10s %-20s %-15s%n",
+                    "No", "Title", "Company", "Salary", "Resume", "Status");
+
+            System.out.println("--------------------------------------------------------------------------");
+
+            for (int i = 0; i < appliedJobs.size(); i++) {
+                Job j = appliedJobs.get(i);
+                System.out.printf("%-5d %-20s %-20s %-10.2f %-20s %-15s%n",
+                        i + 1, j.title, j.company, j.estimatedSalary, j.resumeFile, j.status);
+            }
+        }
+    }
+
+    // ===================== SAFE INPUT =====================
+    static int getValidInt(Scanner sc) {
+        while (true) {
+            try {
+                return Integer.parseInt(sc.nextLine());
+            } catch (Exception e) {
+                System.out.print("Invalid input. Enter a number: ");
+            }
+        }
+    }
+
+    static double getValidDouble(Scanner sc) {
+        while (true) {
+            try {
+                return Double.parseDouble(sc.nextLine());
+            } catch (Exception e) {
+                System.out.print("Invalid number. Enter again: ");
+            }
+        }
+    }
+
+    // ===================== MAIN =====================
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+        JobSeeker seeker = new JobSeeker();
+
+        // ===== DEMO DATA =====
+        seeker.addDemoJob(new Job("Software Engineer", "Google", 5000, "resume1.pdf"));
+        seeker.addDemoJob(new Job("Data Analyst", "Shopee", 4200, "resume2.pdf"));
+        seeker.addDemoJob(new Job("System Developer", "Intel", 4800, "resume3.pdf"));
 
         while (true) {
             System.out.println("\n=========== MENU ===========");
-            System.out.println("1.Apply for Jobs");
-            System.out.println("2.View Applied Jobs");
-            System.out.println("3.Cancel Application");
-            System.out.println("4.Edit Application");
-            System.out.println("5.Exit");
+            System.out.println("1. Apply Job");
+            System.out.println("2. View Jobs");
+            System.out.println("3. Withdraw Application");
+            System.out.println("4. Edit Application");
+            System.out.println("5. Exit");
             System.out.print("Choose option: ");
 
-            int option = 0;
-            try {
-                option = Integer.parseInt(sc.nextLine());
-            } catch (NumberFormatException e) {
-                System.out.println("Invalid input. Please enter a number.");
-                continue;
-            }
+            int option = getValidInt(sc);
 
-            // 1️⃣ Apply for Job
-            if (option == 1) {
-                System.out.print("Enter job title: ");
-                String title = sc.nextLine();
+            switch (option) {
 
-                System.out.print("Enter company: ");
-                String company = sc.nextLine();
-
-                System.out.print("Enter estimated salary (RM): ");
-                double salary;
-                try {
-                    salary = Double.parseDouble(sc.nextLine());
-                } catch (Exception e) {
-                    salary = 0;
-                    System.out.println("Invalid salary input. Setting salary to 0.");
-                }
-
-                appliedJobs.add(new Job(title, company, salary));
-                System.out.println("Application submitted for " + title + " on " + LocalDate.now());
-
-            // 2️⃣ View Applied Jobs
-            } else if (option == 2) {
-                displayJobs(appliedJobs, seekerName);
-
-            // 3️⃣ Cancel Application
-            } else if (option == 3) {
-                displayJobs(appliedJobs, seekerName);
-                if (!appliedJobs.isEmpty()) {
-                    System.out.print("Enter number to cancel: ");
-                    try {
-                        int cancel = Integer.parseInt(sc.nextLine());
-                        if (cancel >= 1 && cancel <= appliedJobs.size()) {
-                            appliedJobs.remove(cancel - 1);
-                            System.out.println("Application cancelled.");
-                        } else {
-                            System.out.println("Invalid selection.");
-                        }
-                    } catch (NumberFormatException e) {
-                        System.out.println("Invalid input.");
+                // APPLY
+                case 1:
+                    String title;
+                    while (true) {
+                        System.out.print("Enter job title: ");
+                        title = sc.nextLine();
+                        if (!isValidTitle(title)) System.out.println("Invalid title.");
+                        else break;
                     }
-                }
 
-            // 4️⃣ Edit Application
-            } else if (option == 4) {
-                displayJobs(appliedJobs, seekerName);
-                if (!appliedJobs.isEmpty()) {
+                    String company;
+                    while (true) {
+                        System.out.print("Enter company: ");
+                        company = sc.nextLine();
+                        if (!isValidCompany(company)) System.out.println("Invalid company.");
+                        else break;
+                    }
+
+                    double salary;
+                    while (true) {
+                        System.out.print("Enter salary: ");
+                        salary = getValidDouble(sc);
+                        if (!isValidSalary(salary)) System.out.println("Minimum RM1500.");
+                        else break;
+                    }
+
+                    String resume;
+                    while (true) {
+                        System.out.print("Enter resume file: ");
+                        resume = sc.nextLine();
+                        if (!isValidResume(resume)) System.out.println("Invalid file type.");
+                        else break;
+                    }
+
+                    seeker.applyJob(new Job(title, company, salary, resume));
+                    break;
+
+                // VIEW (STORY24 CORE)
+                case 2:
+                    seeker.viewJobs();
+                    break;
+
+                // WITHDRAW
+                case 3:
+                    seeker.viewJobs();
+                    System.out.print("Enter number to withdraw: ");
+                    int idx = getValidInt(sc);
+
+                    if (idx >= 1 && idx <= seeker.appliedJobs.size()) {
+                        Job job = seeker.appliedJobs.get(idx - 1);
+                        job.status = "Cancelled";
+                        System.out.println("Application withdrawn.");
+                    } else {
+                        System.out.println("Invalid selection.");
+                    }
+                    break;
+
+                // EDIT
+                case 4:
+                    seeker.viewJobs();
                     System.out.print("Enter number to edit: ");
-                    try {
-                        int edit = Integer.parseInt(sc.nextLine());
-                        if (edit >= 1 && edit <= appliedJobs.size()) {
-                            Job job = appliedJobs.get(edit - 1);
+                    int edit = getValidInt(sc);
 
-                            // Edit job title
-                            System.out.print("Enter new job title (current: " + job.title + "): ");
-                            String newTitle = sc.nextLine();
-                            if (!newTitle.isEmpty()) job.title = newTitle;
+                    if (edit >= 1 && edit <= seeker.appliedJobs.size()) {
 
-                            // Edit company
-                            System.out.print("Still applying to the same company? (Y/N): ");
-                            String sameCompany = sc.nextLine();
-                            if (sameCompany.equalsIgnoreCase("N")) {
-                                System.out.print("Enter new company name: ");
-                                String newCompany = sc.nextLine();
-                                if (!newCompany.isEmpty()) job.company = newCompany;
-                            }
+                        Job job = seeker.appliedJobs.get(edit - 1);
 
-                            // Edit salary
-                            System.out.print("Enter new estimated salary (current: RM " + job.estimatedSalary + "): ");
-                            String salaryInput = sc.nextLine();
-                            if (!salaryInput.isEmpty()) {
-                                try {
-                                    job.estimatedSalary = Double.parseDouble(salaryInput);
-                                } catch (Exception e) {
-                                    System.out.println("⚠ Invalid salary input. Keeping previous salary.");
-                                }
-                            }
-
-                            // Edit apply date
-                            System.out.print("Do you want to change the apply date? (Y/N): ");
-                            String editDate = sc.nextLine();
-                            if (editDate.equalsIgnoreCase("Y")) {
-                                System.out.print("Enter new date (yyyy-MM-dd): ");
-                                String dateInput = sc.nextLine();
-                                try {
-                                    LocalDate newDate = LocalDate.parse(dateInput, formatter);
-                                    job.applyDate = newDate;
-                                } catch (Exception e) {
-                                    System.out.println("⚠ Invalid date input. Keeping previous date.");
-                                }
-                            }
-
-                            System.out.println("Application updated successfully.");
-                        } else {
-                            System.out.println("Invalid selection.");
+                        if (job.status.equalsIgnoreCase("Cancelled")) {
+                            System.out.println("Cannot edit cancelled application.");
+                            break;
                         }
-                    } catch (NumberFormatException e) {
-                        System.out.println("Invalid input.");
+
+                        System.out.println("(Press ENTER to skip)");
+
+                        System.out.print("New title: ");
+                        String newTitle = sc.nextLine();
+                        if (!newTitle.isEmpty() && isValidTitle(newTitle)) job.title = newTitle;
+
+                        System.out.print("New company: ");
+                        String newCompany = sc.nextLine();
+                        if (!newCompany.isEmpty() && isValidCompany(newCompany)) job.company = newCompany;
+
+                        System.out.print("New salary: ");
+                        String s = sc.nextLine();
+                        if (!s.isEmpty()) {
+                            try {
+                                double newSal = Double.parseDouble(s);
+                                if (isValidSalary(newSal)) job.estimatedSalary = newSal;
+                            } catch (Exception e) {}
+                        }
+
+                        System.out.print("New resume: ");
+                        String r = sc.nextLine();
+                        if (!r.isEmpty() && isValidResume(r)) job.resumeFile = r;
+
+                        System.out.println("Application updated.");
                     }
-                }
+                    break;
 
-            // 5️⃣ Exit
-            } else if (option == 5) {
-                System.out.println("Exiting system. Goodbye!");
-                break;
+                case 5:
+                    System.out.println("Exit system.");
+                    return;
 
-            } else {
-                System.out.println("Invalid option. Try again.");
+                default:
+                    System.out.println("Invalid option.");
             }
-        }
-
-        sc.close();
-    }
-
-    // ===================== Helper: Display Jobs =====================
-    static void displayJobs(ArrayList<Job> jobs, String seekerName) {
-        System.out.println("\n===== Applied Jobs for " + seekerName + " =====");
-        if (jobs.isEmpty()) {
-            System.out.println("No applications found.");
-            return;
-        }
-
-        System.out.printf("%-5s %-20s %-20s %-15s %-12s%n", "No", "Job Title", "Company", "Salary (RM)", "Days Waiting");
-        System.out.println("--------------------------------------------------------------------------");
-        for (int i = 0; i < jobs.size(); i++) {
-            Job j = jobs.get(i);
-            long daysWaiting = ChronoUnit.DAYS.between(j.applyDate, LocalDate.now());
-            System.out.printf("%-5d %-20s %-20s %-15.2f %-12d%n",
-                    i + 1, j.title, j.company, j.estimatedSalary, daysWaiting);
         }
     }
 }
