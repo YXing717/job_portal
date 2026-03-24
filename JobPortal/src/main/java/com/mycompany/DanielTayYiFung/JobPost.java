@@ -1,5 +1,7 @@
 package com.mycompany.job_portal;
 
+import java.time.LocalDate;
+
 public class JobPost {
 
     private String jobTitle;
@@ -9,8 +11,9 @@ public class JobPost {
     private String jobLocation;
     private String jobCategory;
     private double jobSalary;
+    private String closingDate;
 
-    public JobPost(String jobTitle, String jobType, String jobCompany, String jobDescription, String jobLocation, String jobCategory, double jobSalary) {
+    public JobPost(String jobTitle, String jobType, String jobCompany, String jobDescription, String jobLocation, String jobCategory, double jobSalary, String closingDate) {
         this.jobTitle = jobTitle;
         this.jobType = jobType;
         this.jobCompany = jobCompany;
@@ -18,6 +21,7 @@ public class JobPost {
         this.jobLocation = jobLocation;
         this.jobCategory = jobCategory;
         this.jobSalary = jobSalary;
+        this.closingDate = closingDate;
     }
 
     // setter & getter
@@ -76,13 +80,39 @@ public class JobPost {
     public double getJobSalary() {
         return jobSalary;
     }
+    
+    public void setClosingDate(String closingDate) {
+        this.closingDate = closingDate;
+    }
+
+    public String getClosingDate() {
+        return closingDate;
+    }
 
     @Override
     public String toString() {
-        return jobTitle + " - " + jobCompany;
+        String status = isExpired() ? "CLOSED" : "OPEN";
+        return jobTitle + " - " + jobCompany + " (" + jobType + ") [" + status + "]";
     }
 
-    public String toFile() {
-        return jobTitle + " | " + jobType + " | " + jobCompany + " | " + jobLocation + " | " + jobDescription + " | " + jobCategory + " | " + jobSalary;
+    public boolean isExpired() {
+        LocalDate today = LocalDate.now();
+        LocalDate closing = null;
+        DateTimeFormatter[] formats = {
+                DateTimeFormatter.ofPattern("d/M/yyyy")
+        };
+
+        for (DateTimeFormatter fmt : formats) {
+            try {
+                closing = LocalDate.parse(closingDate, fmt);
+                break;
+            } catch (Exception ignored) {}
+        }
+
+        if (closing == null) {
+            System.err.println("Invalid closing date: " + closingDate);
+            return false;
+        }
+        return today.isAfter(closing);
     }
 }
