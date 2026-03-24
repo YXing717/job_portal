@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Recommended Jobs - Job Portal</title>
+  <link rel="stylesheet" href="..\/jobportal.css" />
+</head>
+<body>
+  <main class="container">
+    <header class="hero header-flex">
+      <div class="header-left">
+        <h1>Recommended Jobs</h1>
+        <p class="subtitle">Find jobs picked for you based on your profile and preferences.</p>
+      </div>
+      <div class="header-right"></div>
+    </header>
+
+    <section class="search-panel" style="margin-top:18px;">
+      <div class="search-row" style="flex-wrap:wrap;gap:12px;">
+        <div class="input-wrap" style="flex:1;min-width:220px;">
+          <label for="skillInput" style="font-size:0.9rem;color:#94a3b8;">Skills (comma-separated)</label>
+          <input id="skillInput" type="text" placeholder="e.g. JavaScript, React, SQL" />
+        </div>
+        <div class="input-wrap" style="flex:1;min-width:220px;">
+          <label for="prevJobInput" style="font-size:0.9rem;color:#94a3b8;">Previous job titles</label>
+          <input id="prevJobInput" type="text" placeholder="e.g. Jr Software Engineer, QA Tester" />
+        </div>
+        <div class="input-wrap" style="flex:1;min-width:180px;">
+          <label for="experienceSelect" style="font-size:0.9rem;color:#94a3b8;">Experience level</label>
+          <select id="experienceSelect">
+            <option value="junior">Junior</option>
+            <option value="mid" selected>Mid</option>
+            <option value="senior">Senior</option>
+          </select>
+        </div>
+        <div class="input-wrap" style="flex:1;min-width:180px;">
+          <label for="locationSelect" style="font-size:0.9rem;color:#94a3b8;">Preferred location</label>
+          <select id="locationSelect"><option value="">All locations</option></select>
+        </div>
+      </div>
+
+      <div class="search-row" style="gap:12px; margin-top:10px;">
+        <div class="input-wrap" style="width:160px;">
+          <label for="minSalary" style="font-size:0.9rem;color:#94a3b8;">Min salary (RM)</label>
+          <input id="minSalary" type="number" min="0" placeholder="5000" />
+        </div>
+        <div class="input-wrap" style="width:160px;">
+          <label for="maxSalary" style="font-size:0.9rem;color:#94a3b8;">Max salary (RM)</label>
+          <input id="maxSalary" type="number" min="0" placeholder="10000" />
+        </div>
+        <div class="controls" style="margin-top:22px;">
+          <button id="recommendBtn" class="btn">Show recommendations</button>
+          <button id="resetBtn" class="btn remove">Reset</button>
+        </div>
+      </div>
+      <p id="profileHint" class="subtitle" style="margin-top:10px;">Need at least one skill or previous job title to generate recommendations.</p>
+    </section>
+
+    <section id="recommendationStatus" class="foot" style="margin-top:18px;"></section>
+    <section id="recommendationList" class="results"></section>
+  </main>
+
+  <div id="detailModal" class="modal" aria-hidden="true">
+    <div class="modal-content">
+      <button id="modalClose" class="modal-close" aria-label="Close description">×</button>
+      <h2 id="modalTitle"></h2>
+      <p id="modalMeta"></p>
+      <p id="modalDescription"></p>
+    </div>
+  </div>
+
+  <script src="..\/jobportal.js"></script>
+  <script src="recommended.js"></script>
+</body>
+</html>
