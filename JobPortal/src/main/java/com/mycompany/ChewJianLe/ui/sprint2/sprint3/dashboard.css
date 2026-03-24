@@ -1,5 +1,5 @@
 body {
-    font-family: Arial;
+    font-family: Arial, sans-serif;
     margin: 20px;
     background-color: #f4f6f8;
 }
@@ -9,20 +9,29 @@ header {
     margin-bottom: 20px;
 }
 
-.controls {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 15px;
+.section {
+    background: white;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+}
+
+.updated-section {
+    background: #eef7ff;
+}
+
+h2 {
+    margin-bottom: 10px;
 }
 
 input, select {
-    padding: 8px;
+    padding: 6px;
+    margin: 5px;
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
-    background: white;
 }
 
 th {
@@ -43,4 +52,13 @@ button {
     color: white;
     border: none;
     cursor: pointer;
+}
+
+button:hover {
+    background-color: #2980b9;
+}
+
+.message {
+    margin-top: 10px;
+    font-weight: bold;
 }
