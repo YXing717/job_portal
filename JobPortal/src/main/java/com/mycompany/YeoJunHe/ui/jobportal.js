@@ -130,6 +130,14 @@ function getSkillsForTitle(title){
   return mapping[key] || ['relevant skills in the field'];
 }
 
+function getExperienceLevelFromTitle(title){
+  const t = normalize(title);
+  if(/director|chief|vp|head/.test(t)) return 'Director';
+  if(/manager/.test(t)) return 'Director';
+  if(/senior|lead|principal|staff/.test(t)) return 'Senior';
+  return 'Junior';
+}
+
 function getBenefits(){
   return ['health insurance','EPF/CPF contributions','performance bonus','flexible hours','remote work options'];
 }
@@ -148,11 +156,13 @@ function buildDescription(job){
   const upper = Math.round(baseSalary * 1.1);
   const salaryRange = `RM${lower.toLocaleString()} - RM${upper.toLocaleString()}`;
   const skills = getSkillsForTitle(title).join(', ');
+  const experienceLevel = getExperienceLevelFromTitle(title);
   const benefits = getBenefits().join(', ');
   const companyBg = getCompanyBackground(loc);
 
   return `${companyBg}\n\n` +
          `**Position:** ${title} (${loc})\n` +
+         `**Experience Level:** ${experienceLevel}\n` +
          `**Salary Range:** ${salaryRange}\n\n` +
          `**About the Role:**\n` +
          `We are seeking a ${title} to join our team in ${loc}. The ideal candidate will be responsible for day-to-day tasks related to the role, collaborate with cross-functional teams, and contribute to ongoing projects. This position offers growth opportunities within the company.\n\n` +
@@ -170,8 +180,10 @@ JOBS.forEach(j => {
   if(!j.benefits){
     j.benefits = getBenefits();
   }
+  j.requiredSkills = getSkillsForTitle(j.title);
+  j.experienceLevel = getExperienceLevelFromTitle(j.title);
   // create a short tag string for card display
-  j.tagline = `Seats: ${j.seats} · Benefits: ${j.benefits.slice(0,3).join(', ')}`;
+  j.tagline = `Seats: ${j.seats} · ${j.experienceLevel} · Skills: ${j.requiredSkills.slice(0,3).join(', ')}`;
 });
 
 // modal helpers
@@ -444,6 +456,14 @@ function renderResults(page=1){
     if(j.tagline){
       const tags = document.createElement('div'); tags.className='job-tags'; tags.textContent = j.tagline;
       left.appendChild(tags);
+    }
+    if(j.requiredSkills || j.experienceLevel){
+      const extra = document.createElement('div'); extra.className='job-tags';
+      const parts = [];
+      if(j.requiredSkills && j.requiredSkills.length) parts.push(`Required skills: ${j.requiredSkills.join(', ')}`);
+      if(j.experienceLevel) parts.push(`Experience: ${j.experienceLevel}`);
+      extra.textContent = parts.join(' · ');
+      left.appendChild(extra);
     }
     const right = document.createElement('div'); right.className='job-right';
 

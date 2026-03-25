@@ -221,5 +221,87 @@ if(clearBtn){
   });
 }
 
+const profileToggleBtn = document.getElementById('profileToggleBtn');
+const sidebarCloseBtn = document.getElementById('sidebarCloseBtn');
+const sidebarOverlay = document.getElementById('sidebarOverlay');
+const profileSidebar = document.getElementById('profileSidebar');
+const saveProfileBtn = document.getElementById('saveProfileBtn');
+
+const salaryRangeInput = document.getElementById('salaryRange');
+const locationInput = document.getElementById('location');
+const skillsInput = document.getElementById('skills');
+const jobRoleInput = document.getElementById('jobRole');
+const experienceInput = document.getElementById('experience');
+
+function setProfileSidebar(open){
+  if(!profileSidebar || !sidebarOverlay) return;
+  profileSidebar.classList.toggle('open', open);
+  sidebarOverlay.classList.toggle('active', open);
+  profileSidebar.setAttribute('aria-hidden', String(!open));
+  if(open){
+    document.body.style.overflow = 'hidden';
+  } else {
+    document.body.style.overflow = '';
+  }
+}
+
+function getUserProfile(){
+  try{
+    const raw = localStorage.getItem('userProfile');
+    return raw ? JSON.parse(raw) : {};
+  }catch(e){
+    return {};
+  }
+}
+
+function saveUserProfile(profile){
+  localStorage.setItem('userProfile', JSON.stringify(profile));
+}
+
+function updateProfileForm(profile){
+  if(!profile) profile = {};
+  if(salaryRangeInput) salaryRangeInput.value = profile.salaryRange || '';
+  if(locationInput) locationInput.value = profile.location || '';
+  if(skillsInput) skillsInput.value = profile.skills || '';
+  if(jobRoleInput) jobRoleInput.value = profile.jobRole || '';
+  if(experienceInput) experienceInput.value = profile.experience || '';
+}
+
+function getProfileFormData(){
+  return {
+    salaryRange: salaryRangeInput?.value.trim() || '',
+    location: locationInput?.value.trim() || '',
+    skills: skillsInput?.value.trim() || '',
+    jobRole: jobRoleInput?.value.trim() || '',
+    experience: experienceInput?.value || ''
+  };
+}
+
+function loadProfile(){
+  const profile = getUserProfile();
+  updateProfileForm(profile);
+}
+
+if(profileToggleBtn){
+  profileToggleBtn.addEventListener('click', () => {
+    setProfileSidebar(true);
+  });
+}
+if(sidebarCloseBtn){
+  sidebarCloseBtn.addEventListener('click', () => setProfileSidebar(false));
+}
+if(sidebarOverlay){
+  sidebarOverlay.addEventListener('click', () => setProfileSidebar(false));
+}
+if(saveProfileBtn){
+  saveProfileBtn.addEventListener('click', () => {
+    const profile = getProfileFormData();
+    saveUserProfile(profile);
+    showSnackbar('Profile saved', 'success');
+    setProfileSidebar(false);
+  });
+}
+
+loadProfile();
 loadAvatar();
 renderSavedJobs();
