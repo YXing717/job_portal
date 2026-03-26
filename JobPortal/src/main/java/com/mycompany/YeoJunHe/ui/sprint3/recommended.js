@@ -242,7 +242,7 @@ function renderRecommendations(){
 
     const meta = document.createElement('div');
     meta.className = 'job-meta';
-    meta.textContent = `${job.location} • RM${job.salary.toLocaleString()}`;
+    meta.textContent = `${job.company || 'Unknown Company'} • ${job.location} • RM${job.salary.toLocaleString()}`;
 
     const reasonList = document.createElement('div');
     reasonList.className = 'job-tags';
