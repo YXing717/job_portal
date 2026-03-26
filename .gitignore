@@ -18,6 +18,11 @@
 /JobPortal/src/main/java/com/mycompany/DanielTayYiFung/jest.config.js
 /JobPortal/src/main/java/com/mycompany/DanielTayYiFung/jest.setup.js
 
+/JobPortal/src/main/java/com/mycompany/ChewJianLe/ui/node_modules
+/JobPortal/src/main/java/com/mycompany/ChewJianLe/ui/package.json
+/JobPortal/src/main/java/com/mycompany/ChewJianLe/ui/package-lock.json
+/JobPortal/src/main/java/com/mycompany/ChewJianLe/ui/jest.config.js
 
 
 /JobPortal/src/main/java/com/mycompany/gunyuxing/register.test.js
+/JobPortal/src/main/java/com/mycompany/ChewJianLe/ui/apply.test.js
