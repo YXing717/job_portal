@@ -1,19 +1,17 @@
 <!doctype html>
 <html lang="en">
-
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Recommended Jobs - Job Portal</title>
-  <link rel="stylesheet" href="../jobportal.css" />
+  <link rel="stylesheet" href="..\/jobportal.css" />
 </head>
-
 <body>
   <nav class="top-nav">
-    <div class="saved-wrapper" style="display: flex; align-items: center; gap: 10px;">
-      <button id="profileToggleBtn" class="btn btn-primary" style="cursor: pointer; border: none; padding: 6px 14px; border-radius: 6px; background: #2196f3; color: white; font-weight: 500; font-size: 14px;">User Information</button>
-      <a class="btn" href="../profile.html" title="Edit profile">⚙️</a>
-      <a class="btn" href="../JobPortalPage.html" title="Job search">🔍</a>
+    <div class="saved-wrapper">
+      <a class="btn" href="..\/JobPortalPage.html" title="Back to main jobs">←</a>
+      <a class="btn" href="..\/profile.html" title="Edit profile">⚙️</a>
+      <a class="btn" href="..\/JobPortalPage.html" title="Job search">🔍</a>
     </div>
   </nav>
 
@@ -26,88 +24,50 @@
       <div class="header-right"></div>
     </header>
 
-    <div style="margin-top: 20px; display: flex; align-items: center; gap: 12px; background: #fff; padding: 12px 16px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-      <label for="primaryFilter" style="font-weight: 600; color: #333;">Recommendation Mode:</label>
-      <select id="primaryFilter" style="padding: 8px 12px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px; background-color: #f9fafb; cursor: pointer; color: #000;">
-        <option value="best">Best Match (Strict)</option>
-        <option value="skills">By Skills</option>
-        <option value="location">By Location</option>
-        <option value="role">By Job Role</option>
-      </select>
-    </div>
+    <section class="search-panel" style="margin-top:18px;">
+      <div class="search-row" style="flex-wrap:wrap;gap:12px;">
+        <div class="input-wrap" style="flex:1;min-width:220px;">
+          <label for="skillInput" style="font-size:0.9rem;color:#94a3b8;">Skills (comma-separated)</label>
+          <input id="skillInput" type="text" placeholder="e.g. JavaScript, React, SQL" />
+        </div>
+        <div class="input-wrap" style="flex:1;min-width:220px;">
+          <label for="prevJobInput" style="font-size:0.9rem;color:#94a3b8;">Previous job titles</label>
+          <input id="prevJobInput" type="text" placeholder="e.g. Jr Software Engineer, QA Tester" />
+        </div>
+        <div class="input-wrap" style="flex:1;min-width:180px;">
+          <label for="experienceSelect" style="font-size:0.9rem;color:#94a3b8;">Experience level</label>
+          <select id="experienceSelect">
+            <option value="junior">Junior</option>
+            <option value="mid" selected>Mid</option>
+            <option value="senior">Senior</option>
+          </select>
+        </div>
+        <div class="input-wrap" style="flex:1;min-width:180px;">
+          <label for="locationSelect" style="font-size:0.9rem;color:#94a3b8;">Preferred location</label>
+          <select id="locationSelect"><option value="">All locations</option></select>
+        </div>
+      </div>
 
-    <style>
-      .mismatch-container {
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-        align-items: flex-end;
-        margin-left: 16px;
-      }
-      .mismatch-badge {
-        background-color: #fee2e2;
-        color: #ef4444;
-        border: 1px solid #fecaca;
-        padding: 4px 8px;
-        border-radius: 6px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        white-space: nowrap;
-      }
-      .match-badge {
-        background-color: #dcfce7;
-        color: #16a34a;
-        border: 1px solid #bbf7d0;
-        padding: 4px 8px;
-        border-radius: 6px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        white-space: nowrap;
-      }
-      .job-card {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
-      .job-left {
-        flex: 1;
-      }
-    </style>
+      <div class="search-row" style="gap:12px; margin-top:10px;">
+        <div class="input-wrap" style="width:160px;">
+          <label for="minSalary" style="font-size:0.9rem;color:#94a3b8;">Min salary (RM)</label>
+          <input id="minSalary" type="number" min="0" placeholder="5000" />
+        </div>
+        <div class="input-wrap" style="width:160px;">
+          <label for="maxSalary" style="font-size:0.9rem;color:#94a3b8;">Max salary (RM)</label>
+          <input id="maxSalary" type="number" min="0" placeholder="10000" />
+        </div>
+        <div class="controls" style="margin-top:22px;">
+          <button id="recommendBtn" class="btn">Show recommendations</button>
+          <button id="resetBtn" class="btn remove">Reset</button>
+        </div>
+      </div>
+      <p id="profileHint" class="subtitle" style="margin-top:10px;">Need at least one skill or previous job title to generate recommendations.</p>
+    </section>
 
     <section id="recommendationStatus" class="foot" style="margin-top:18px;"></section>
     <section id="recommendationList" class="results"></section>
   </main>
-
-  <aside id="profileSidebar" class="profile-sidebar" aria-hidden="true">
-    <div class="sidebar-header">
-      <h2>User profile</h2>
-      <button id="sidebarCloseBtn" class="btn remove" aria-label="Close profile sidebar">✕</button>
-    </div>
-    <form id="profileForm" class="profile-form">
-      <label>SALARY RANGE (RM)
-        <input id="salaryRange" type="text" placeholder="e.g., 2500-4500">
-      </label>
-      <label>LOCATION
-        <input id="location" type="text" placeholder="e.g., Kuala Lumpur">
-      </label>
-      <label>SKILLS
-        <input id="skills" type="text" placeholder="e.g., Java, React, SQL">
-      </label>
-      <label>ROLE
-        <input id="jobRole" type="text" placeholder="e.g., Software Engineer">
-      </label>
-      <label>EXPERIENCE LEVEL
-        <select id="experience" style="color: #000;">
-          <option value="">-- select --</option>
-          <option value="Junior" style="color: #000;">Junior</option>
-          <option value="Senior" style="color: #000;">Senior</option>
-          <option value="Director" style="color: #000;">Director</option>
-        </select>
-      </label>
-      <button id="saveProfileBtn" type="button" class="btn save">Save profile</button>
-    </form>
-  </aside>
-  <div id="sidebarOverlay"></div>
 
   <div id="detailModal" class="modal" aria-hidden="true">
     <div class="modal-content">
@@ -118,8 +78,7 @@
     </div>
   </div>
 
-  <script src="../jobportal.js"></script>
+  <script src="..\/jobportal.js"></script>
   <script src="recommended.js"></script>
 </body>
-
 </html>
