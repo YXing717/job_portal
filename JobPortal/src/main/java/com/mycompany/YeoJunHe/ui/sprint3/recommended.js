@@ -166,7 +166,7 @@ function getUserProfile() {
 }
 
 function isProfileEligible(profile) {
-  return profile.skills.length > 0 || profile.previousJobs.length > 0;
+  return profile && profile.skills && profile.skills.length > 0;
 }
 
 function getRecommendationReasons(job, profile) {
@@ -229,29 +229,23 @@ function recommendJobs(profile) {
     if (profile.minSalary !== null && job.salary < profile.minSalary) return false;
     if (profile.maxSalary !== null && job.salary > profile.maxSalary) return false;
 
-    if (profile.skills.length > 0) {
-      // match against job's defined required skills first
-      const jobSkills = (job.requiredSkills || []).map(s => normalizeText(s));
+    // Skills are now mandatory
+    if (profile.skills.length === 0) return false;
+
+    const jobSkills = (job.requiredSkills || []).map(s => normalizeText(s));
       const userSkills = profile.skills.map(s => normalizeText(s));
       const skillMatch = userSkills.some(us => jobSkills.some(js => js.includes(us) || us.includes(js)));
       if (!skillMatch) {
         // fallback to description search when explicit keywords not defined
         const jobText = getKeywordsFromJob(job);
         const textMatch = userSkills.some(us => jobText.includes(us));
-        if (!textMatch) return false;
-      }
+      if (!textMatch) return false;
     }
 
     return true;
   });
 
-  if (filtered.length > 0) {
-    return filtered; // show all matched results
-  }
-
-  // If no exact matches, return compatible fallback roles (still no senior if junior, etc.)
-  return JOBS.filter(job => isExperienceCompatible(profile.experience, job.title));
-
+  return filtered;
 }
 
 function showSnackbar(msg, type = 'success') {
@@ -305,7 +299,7 @@ function renderRecommendations() {
         skillMatch = userSkills.some(us => jobText.includes(normalizeText(us)));
       }
     } else {
-      skillMatch = true;
+      skillMatch = false;
     }
 
     const locationMatch = !userLocation || normalizeText(userLocation) === normalizeText(job.location);
@@ -322,7 +316,7 @@ function renderRecommendations() {
 
     let isMatch = true;
     if (filterMode === 'skills') {
-      isMatch = userSkills.length === 0 ? true : skillMatch;
+      isMatch = skillMatch;
     } else if (filterMode === 'location') {
       isMatch = locationMatch;
     } else if (filterMode === 'role') {
