@@ -333,6 +333,10 @@ function renderRecommendations() {
 
     if (!isMatch) return false;
 
+    // Check if dismissed
+    const key = `${normalizeText(job.title)}|${normalizeText(job.location)}|${job.salary}`;
+    if (dismissedJobs.has(key)) return false;
+
     job.mismatches = [];
     job.matches = [];
 
@@ -385,7 +389,7 @@ function renderRecommendations() {
 
     const meta = document.createElement('div');
     meta.className = 'job-meta';
-    meta.textContent = `${job.location} • RM${job.salary.toLocaleString()}`;
+    meta.textContent = `${job.company || 'Unknown Company'} • ${job.location} • RM${job.salary.toLocaleString()}`;
 
     if (job.tagline) {
       const tags = document.createElement('div');
@@ -401,10 +405,34 @@ function renderRecommendations() {
 
     const right = document.createElement('div');
     right.className = 'job-right';
+    right.style.display = 'flex';
+    right.style.flexDirection = 'column';
+    right.style.alignItems = 'flex-end';
+    right.style.gap = '8px';
+
+    // Dismiss button as a block at the top
+    const dismissBtn = document.createElement('button');
+    dismissBtn.className = 'btn remove';
+    dismissBtn.textContent = '×';
+    dismissBtn.style.padding = '4px 8px';
+    dismissBtn.style.fontSize = '12px';
+    dismissBtn.title = 'Dismiss this recommendation';
+    dismissBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      const key = `${normalizeText(job.title)}|${normalizeText(job.location)}|${job.salary}`;
+      dismissedJobs.add(key);
+      showSnackbar('Recommendation dismissed', 'info');
+      renderRecommendations();
+    });
+    right.appendChild(dismissBtn);
 
     if ((job.mismatches && job.mismatches.length > 0) || (job.matches && job.matches.length > 0)) {
       const mismatchContainer = document.createElement('div');
       mismatchContainer.className = 'mismatch-container';
+      mismatchContainer.style.display = 'flex';
+      mismatchContainer.style.flexDirection = 'column';
+      mismatchContainer.style.alignItems = 'flex-end';
+      mismatchContainer.style.gap = '4px';
 
       if (job.matches) {
         job.matches.forEach(m => {
