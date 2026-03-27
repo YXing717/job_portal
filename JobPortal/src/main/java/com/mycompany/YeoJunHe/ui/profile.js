@@ -1,50 +1,49 @@
-// Utilities (mirrors helpers in jobportal.js)
-function normalize(s){
-  if(!s) return "";
+function normalize(s) {
+  if (!s) return "";
   s = s.normalize('NFD').replace(/\p{Diacritic}/gu, '');
-  s = s.replace(/[^\p{L}\p{N} ]+/gu,' ');
-  return s.toLowerCase().trim().replace(/\s+/g,' ');
+  s = s.replace(/[^\p{L}\p{N} ]+/gu, ' ');
+  return s.toLowerCase().trim().replace(/\s+/g, ' ');
 }
 
-function getJobKey(job){
-  if(!job) return '';
+function getJobKey(job) {
+  if (!job) return '';
   return `${normalize(job.title)}|${normalize(job.location)}|${job.salary}`;
 }
 
-function parseSavedJobsRaw(raw){
-  if(!raw) return [];
-  try{
+function parseSavedJobsRaw(raw) {
+  if (!raw) return [];
+  try {
     const arr = JSON.parse(raw);
-    if(Array.isArray(arr)){
+    if (Array.isArray(arr)) {
       return arr.map(item => {
-        if(item && typeof item === 'object') return item;
-        if(typeof item === 'string'){
+        if (item && typeof item === 'object') return item;
+        if (typeof item === 'string') {
           const parts = item.split('|');
-          return {title: parts[0] || '', location: parts[1] || '', salary: parseFloat(parts[2]) || 0};
+          return { title: parts[0] || '', location: parts[1] || '', salary: parseFloat(parts[2]) || 0 };
         }
         return null;
       }).filter(Boolean);
     }
-  }catch(e){
+  } catch (e) {
     // fall back to parsing as comma-separated keys
   }
 
   const parts = raw.split(',').map(s => s.trim()).filter(Boolean);
   return parts.map(part => {
     const parts = part.split('|');
-    return {title: parts[0] || '', location: parts[1] || '', salary: parseFloat(parts[2]) || 0};
+    return { title: parts[0] || '', location: parts[1] || '', salary: parseFloat(parts[2]) || 0 };
   });
 }
 
-function getSavedJobsFromStorage(){
+function getSavedJobsFromStorage() {
   let raw = sessionStorage.getItem('savedJobsData') || localStorage.getItem('savedJobsData');
-  if(!raw && location.hash.startsWith('#saved=')){
-    try{ raw = decodeURIComponent(location.hash.slice(7)); }catch(e){ raw = null; }
+  if (!raw && location.hash.startsWith('#saved=')) {
+    try { raw = decodeURIComponent(location.hash.slice(7)); } catch (e) { raw = null; }
   }
   return parseSavedJobsRaw(raw);
 }
 
-function setSavedJobs(jobs){
+function setSavedJobs(jobs) {
   const str = JSON.stringify(jobs);
   localStorage.setItem('savedJobsData', str);
   sessionStorage.setItem('savedJobsData', str);
@@ -55,10 +54,10 @@ function setSavedJobs(jobs){
   sessionStorage.setItem('savedJobs', keyStr);
 }
 
-function updateSavedCount(count){
+function updateSavedCount(count) {
   const badge = document.getElementById('savedCount');
-  if(!badge) return;
-  if(count > 0){
+  if (!badge) return;
+  if (count > 0) {
     badge.textContent = count;
     badge.style.display = 'flex';
   } else {
@@ -66,17 +65,17 @@ function updateSavedCount(count){
   }
 }
 
-function showSnackbar(msg, type='success'){
+function showSnackbar(msg, type = 'success') {
   let sn = document.getElementById('snackbar');
-  if(!sn){
+  if (!sn) {
     sn = document.createElement('div');
-    sn.id='snackbar';
-    sn.className='snackbar';
+    sn.id = 'snackbar';
+    sn.className = 'snackbar';
     document.body.appendChild(sn);
   }
   sn.textContent = msg;
   sn.className = `snackbar show ${type}`;
-  setTimeout(()=>{ sn.className = 'snackbar'; }, 3000);
+  setTimeout(() => { sn.className = 'snackbar'; }, 3000);
 }
 
 const modal = document.getElementById('detailModal');
@@ -85,38 +84,38 @@ const modalMeta = document.getElementById('modalMeta');
 const modalDescription = document.getElementById('modalDescription');
 const modalClose = document.getElementById('modalClose');
 
-function openModal(job){
+function openModal(job) {
   modalTitle.textContent = job.title;
-  modalMeta.textContent = `${job.location} • RM${(job.salary||0).toLocaleString()}`;
+  modalMeta.textContent = `${job.location} • RM${(job.salary || 0).toLocaleString()}`;
   const html = (job.description || '')
-                .replace(/\n/g,'<br>')
-                .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
+    .replace(/\n/g, '<br>')
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
   modalDescription.innerHTML = html;
   modal.style.display = 'flex';
-  modal.setAttribute('aria-hidden','false');
+  modal.setAttribute('aria-hidden', 'false');
 }
 
-function closeModal(){
+function closeModal() {
   modal.style.display = 'none';
-  modal.setAttribute('aria-hidden','true');
+  modal.setAttribute('aria-hidden', 'true');
 }
 
-if(modalClose){
+if (modalClose) {
   modalClose.addEventListener('click', closeModal);
 }
-if(modal){
-  modal.addEventListener('click', e => { if(e.target === modal) closeModal(); });
+if (modal) {
+  modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
 }
 
-function renderSavedJobs(){
+function renderSavedJobs() {
   const container = document.getElementById('savedJobs');
   const jobs = getSavedJobsFromStorage();
   updateSavedCount(jobs.length);
 
-  if(!container) return;
+  if (!container) return;
   container.innerHTML = '';
 
-  if(jobs.length === 0){
+  if (jobs.length === 0) {
     container.innerHTML = `
       <div class="job-card no-results">
         <div class="no-results-emoji anime-emoji">💾</div>
@@ -127,14 +126,14 @@ function renderSavedJobs(){
       </div>
     `;
     const clearBtn = document.getElementById('clearBtn');
-    if(clearBtn) clearBtn.style.display = 'none';
+    if (clearBtn) clearBtn.style.display = 'none';
     return;
   }
 
   const clearBtn = document.getElementById('clearBtn');
-  if(clearBtn) clearBtn.style.display = 'inline-block';
+  if (clearBtn) clearBtn.style.display = 'inline-block';
 
-  for(const job of jobs){
+  for (const job of jobs) {
     const card = document.createElement('div');
     card.className = 'job-card';
 
@@ -148,7 +147,7 @@ function renderSavedJobs(){
     title.textContent = job.title;
     const meta = document.createElement('div');
     meta.className = 'job-meta';
-    meta.textContent = `${job.location} • RM${(job.salary||0).toLocaleString()}`;
+    meta.textContent = `${job.location} • RM${(job.salary || 0).toLocaleString()}`;
     left.appendChild(icon);
     left.appendChild(title);
     left.appendChild(meta);
@@ -180,22 +179,22 @@ function renderSavedJobs(){
 const avatarImg = document.getElementById('avatarImg');
 const avatarInput = document.getElementById('avatarInput');
 
-function loadAvatar(){
+function loadAvatar() {
   const data = localStorage.getItem('avatar');
-  if(data && avatarImg){ avatarImg.src = data; }
+  if (data && avatarImg) { avatarImg.src = data; }
 }
-function saveAvatar(dataUrl){
+function saveAvatar(dataUrl) {
   localStorage.setItem('avatar', dataUrl);
 }
 
-if(avatarInput){
+if (avatarInput) {
   avatarInput.addEventListener('change', e => {
     const file = e.target.files[0];
-    if(file){
+    if (file) {
       const reader = new FileReader();
       reader.onload = ev => {
         const url = ev.target.result;
-        if(avatarImg) avatarImg.src = url;
+        if (avatarImg) avatarImg.src = url;
         saveAvatar(url);
       };
       reader.readAsDataURL(file);
@@ -204,7 +203,7 @@ if(avatarInput){
 }
 
 const backBtn = document.getElementById('backBtn');
-if(backBtn){
+if (backBtn) {
   backBtn.addEventListener('click', e => {
     // make sure saved jobs are persisted before returning
     const jobs = getSavedJobsFromStorage();
@@ -213,7 +212,7 @@ if(backBtn){
 }
 
 const clearBtn = document.getElementById('clearBtn');
-if(clearBtn){
+if (clearBtn) {
   clearBtn.addEventListener('click', () => {
     setSavedJobs([]);
     showSnackbar('All saved jobs cleared', 'success');
@@ -221,5 +220,87 @@ if(clearBtn){
   });
 }
 
+const profileToggleBtn = document.getElementById('profileToggleBtn');
+const sidebarCloseBtn = document.getElementById('sidebarCloseBtn');
+const sidebarOverlay = document.getElementById('sidebarOverlay');
+const profileSidebar = document.getElementById('profileSidebar');
+const saveProfileBtn = document.getElementById('saveProfileBtn');
+
+const salaryRangeInput = document.getElementById('salaryRange');
+const locationInput = document.getElementById('location');
+const skillsInput = document.getElementById('skills');
+const jobRoleInput = document.getElementById('jobRole');
+const experienceInput = document.getElementById('experience');
+
+function setProfileSidebar(open) {
+  if (!profileSidebar || !sidebarOverlay) return;
+  profileSidebar.classList.toggle('open', open);
+  sidebarOverlay.classList.toggle('active', open);
+  profileSidebar.setAttribute('aria-hidden', String(!open));
+  if (open) {
+    document.body.style.overflow = 'hidden';
+  } else {
+    document.body.style.overflow = '';
+  }
+}
+
+function getUserProfile() {
+  try {
+    const raw = localStorage.getItem('userProfile');
+    return raw ? JSON.parse(raw) : {};
+  } catch (e) {
+    return {};
+  }
+}
+
+function saveUserProfile(profile) {
+  localStorage.setItem('userProfile', JSON.stringify(profile));
+}
+
+function updateProfileForm(profile) {
+  if (!profile) profile = {};
+  if (salaryRangeInput) salaryRangeInput.value = profile.salaryRange || '';
+  if (locationInput) locationInput.value = profile.location || '';
+  if (skillsInput) skillsInput.value = profile.skills || '';
+  if (jobRoleInput) jobRoleInput.value = profile.jobRole || '';
+  if (experienceInput) experienceInput.value = profile.experience || '';
+}
+
+function getProfileFormData() {
+  return {
+    salaryRange: salaryRangeInput?.value.trim() || '',
+    location: locationInput?.value.trim() || '',
+    skills: skillsInput?.value.trim() || '',
+    jobRole: jobRoleInput?.value.trim() || '',
+    experience: experienceInput?.value || ''
+  };
+}
+
+function loadProfile() {
+  const profile = getUserProfile();
+  updateProfileForm(profile);
+}
+
+if (profileToggleBtn) {
+  profileToggleBtn.addEventListener('click', () => {
+    setProfileSidebar(true);
+  });
+}
+if (sidebarCloseBtn) {
+  sidebarCloseBtn.addEventListener('click', () => setProfileSidebar(false));
+}
+if (sidebarOverlay) {
+  sidebarOverlay.addEventListener('click', () => setProfileSidebar(false));
+}
+if (saveProfileBtn) {
+  saveProfileBtn.addEventListener('click', () => {
+    const profile = getProfileFormData();
+    saveUserProfile(profile);
+    showSnackbar('Profile saved', 'success');
+    setProfileSidebar(false);
+  });
+}
+
+loadProfile();
 loadAvatar();
 renderSavedJobs();

@@ -1,22 +1,26 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Job Portal - Demo</title>
   <link rel="stylesheet" href="jobportal.css">
 </head>
+
 <body>
 
   <!-- top fixed navigation for profile and avatar -->
   <nav class="top-nav">
     <div class="saved-wrapper">
-      <a id="profileBtn" class="btn" title="View saved jobs" href="profile.html">🔖</a>
       <a id="recommendBtn" class="btn" title="Go to recommendations" href="sprint3/recommended.html">⭐</a>
+      <a id="profileBtn" class="btn" title="View saved jobs" href="profile.html">🔖</a>
       <span id="savedCount" class="badge"></span>
     </div>
     <div class="avatar-wrap">
-      <img id="avatarImg" src="data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='20' cy='20' r='20' fill='%2307122a' stroke='%237c3aed' stroke-width='2'/%3E%3Ccircle cx='20' cy='15' r='6' fill='%237c3aed'/%3E%3Cpath d='M8 35c0-8 6-14 12-14s12 6 12 14' fill='%237c3aed'/%3E%3C/svg%3E" alt="avatar" class="avatar"/>
+      <img id="avatarImg"
+        src="data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='20' cy='20' r='20' fill='%2307122a' stroke='%237c3aed' stroke-width='2'/%3E%3Ccircle cx='20' cy='15' r='6' fill='%237c3aed'/%3E%3Cpath d='M8 35c0-8 6-14 12-14s12 6 12 14' fill='%237c3aed'/%3E%3C/svg%3E"
+        alt="avatar" class="avatar" />
       <input type="file" id="avatarInput" accept="image/*" style="display:none;" />
       <label for="avatarInput" class="btn avatar-edit-btn" title="Change avatar">Edit</label>
     </div>
@@ -25,7 +29,8 @@
     <header class="hero header-flex">
       <div class="header-left">
         <h1>Job Portal</h1>
-        <p class="subtitle">Find your next opportunity across Malaysia – try searching or experimenting with keywords</p>
+        <p class="subtitle">Find your next opportunity across Malaysia – try searching or experimenting with keywords
+        </p>
       </div>
       <div class="header-right">
         <!-- moved to top-nav -->
@@ -50,11 +55,14 @@
         <div id="infoTooltip" class="tooltip" role="tooltip">
           <p><strong>Search modes with examples:</strong></p>
           <ul>
-            <li><strong>Partial</strong><br>query <code>engineer</code> finds “Software Engineer”, “QA Engineer”, etc.</li>
+            <li><strong>Partial</strong><br>query <code>engineer</code> finds “Software Engineer”, “QA Engineer”, etc.
+            </li>
             <li><strong>Exact</strong><br>query <code>Software Engineer</code> matches only that full title.</li>
-            <li><strong>Multi-keyword</strong><br>separate terms with commas and mix title/location keywords with a salary floor. Example:
+            <li><strong>Multi-keyword</strong><br>separate terms with commas and mix title/location keywords with a
+              salary floor. Example:
               <ul>
-                <li><code>software,kl,3000</code> finds jobs whose title or location contains “software” AND “kl” (Kuala Lumpur) with salary ≥ 3000</li>
+                <li><code>software,kl,3000</code> finds jobs whose title or location contains “software” AND “kl” (Kuala
+                  Lumpur) with salary ≥ 3000</li>
               </ul>
             </li>
           </ul>
@@ -84,4 +92,5 @@
 
   <script src="jobportal.js"></script>
 </body>
+
 </html>
