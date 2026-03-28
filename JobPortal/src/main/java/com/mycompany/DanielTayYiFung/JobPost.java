@@ -13,6 +13,10 @@ public class JobPost {
     private double jobSalary;
     private String closingDate;
 
+    public JobPost(String title, String type, String company, String location, String description, String category, double salary) {
+        this(title, type, company, location, description, category, salary, "");
+    }
+    
     public JobPost(String jobTitle, String jobType, String jobCompany, String jobDescription, String jobLocation, String jobCategory, double jobSalary, String closingDate) {
         this.jobTitle = jobTitle;
         this.jobType = jobType;
@@ -92,7 +96,14 @@ public class JobPost {
     @Override
     public String toString() {
         String status = isExpired() ? "CLOSED" : "OPEN";
-        return jobTitle + " - " + jobCompany + " (" + jobType + ") [" + status + "]";
+        String date = (closingDate == null || closingDate.isEmpty())
+                ? "No closing date"
+                : closingDate;
+
+        return jobTitle + " - " + jobCompany
+                + " (" + jobType + ")"
+                + " | Closing: " + date
+                + " [" + status + "]";
     }
 
     public boolean isExpired() {
