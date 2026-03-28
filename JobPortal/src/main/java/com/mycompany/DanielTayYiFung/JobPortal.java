@@ -26,7 +26,6 @@ public class JobPortal extends JFrame{
   private JTextField jobLocationField;
   private JTextArea jobDescriptionArea;
   private JSpinner jobSalarySpinner;
-  private JDateChooser closingDateChooser;
   private ArrayList<JobPost> jobs = new ArrayList<>();
   
   private final String FILE_NAME = "jobs.csv";
@@ -45,33 +44,43 @@ public class JobPortal extends JFrame{
 
         mainPanel.add(createMenuPanel(), "MENU");
         mainPanel.add(createFormPanel(), "FORM");
+        mainPanel.add(createJobListPanel(), "JOB_LIST");
 
         add(mainPanel);
 
         cardLayout.show(mainPanel, "MENU");
     }
 
-  // UI methods
+  // -------------------------UI METHODS----------------------------
   private JPanel createMenuPanel() {
-
+        // menu
         JPanel panel = new JPanel(new BorderLayout(20, 20));
-        // title
         JLabel title = new JLabel("Job Portal System", JLabel.CENTER);
         title.setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 24));
         panel.add(title, BorderLayout.NORTH);
-        // button container
+        // buttons
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
+    
         JButton createBtn = new JButton("Create New Job Post");
-        JButton updateBtn = new JButton("Update Existing Job Post");
         createBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
-        updateBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
         createBtn.setMaximumSize(new Dimension(250, 40));
+    
+        JButton updateBtn = new JButton("Update Existing Job Post");
+        updateBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
         updateBtn.setMaximumSize(new Dimension(250, 40));
+
+        JButton listJobsBtn = new JButton("List of Jobs");
+        listJobsBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+        listJobsBtn.setMaximumSize(new Dimension(250, 40));
+    
         buttonPanel.add(createBtn);
         buttonPanel.add(javax.swing.Box.createVerticalStrut(20));
         buttonPanel.add(updateBtn);
+        buttonPanel.add(javax.swing.Box.createVerticalStrut(20));
+        buttonPanel.add(listJobsBtn);
         panel.add(buttonPanel, BorderLayout.CENTER);
+    
         // button actions
         createBtn.addActionListener(e -> {
             updateMode = false;
@@ -80,6 +89,7 @@ public class JobPortal extends JFrame{
             jobListPanel.setVisible(false);
             cardLayout.show(mainPanel, "FORM");
         });
+    
         updateBtn.addActionListener(e -> {
             updateMode = true;
 
@@ -90,6 +100,11 @@ public class JobPortal extends JFrame{
             }
 
             cardLayout.show(mainPanel, "FORM");
+        });
+    
+        listJobsBtn.addActionListener(e -> {
+            refreshJobListPanel();
+            cardLayout.show(mainPanel, "JOB_LIST");
         });
         return panel;
     }
@@ -104,9 +119,9 @@ public class JobPortal extends JFrame{
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof JobPost job) {
                     if (job.isExpired()) {
-                        setForeground(Color.RED); // CLOSED jobs in red
+                        setForeground(Color.RED);
                     } else {
-                        setForeground(Color.BLACK); // OPEN jobs normal
+                        setForeground(Color.BLACK);
                     }
                 }
                 return this;
@@ -167,11 +182,6 @@ public class JobPortal extends JFrame{
                 new SpinnerNumberModel(1000, 0, 50000, 500)
         );
         form.add(jobSalarySpinner);
-
-        form.add(new JLabel("Closing Date:"));
-        closingDateChooser = new JDateChooser();
-        closingDateChooser.setDateFormatString("yyyy-MM-dd");
-        form.add(closingDateChooser);
     
         panel.add(form, BorderLayout.CENTER);
 
@@ -200,6 +210,29 @@ public class JobPortal extends JFrame{
                 displaySelectedJob();
             }
         });
+        return panel;
+    }
+
+    private JPanel jobListContainer;
+
+    private JPanel createJobListPanel() {
+        JPanel panel = new JPanel(new BorderLayout(10, 10));
+
+        JLabel title = new JLabel("Job Listings", JLabel.CENTER);
+        title.setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 20));
+        panel.add(title, BorderLayout.NORTH);
+
+        // class variable
+        jobListContainer = new JPanel();
+        jobListContainer.setLayout(new BoxLayout(jobListContainer, BoxLayout.Y_AXIS));
+
+        JScrollPane scrollPane = new JScrollPane(jobListContainer);
+        panel.add(scrollPane, BorderLayout.CENTER);
+
+        JButton backBtn = new JButton("Back");
+        backBtn.addActionListener(e -> cardLayout.show(mainPanel, "MENU"));
+        panel.add(backBtn, BorderLayout.SOUTH);
+
         return panel;
     }
 
@@ -234,7 +267,7 @@ public class JobPortal extends JFrame{
 
     private boolean saveJobs() {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(FILE_NAME))) {
-          bw.write("Title,Type,Company,Location,Description,Category,Salary");
+          bw.write("Title,Type,Company,Location,Description,Category,Salary,Closing Date");
           bw.newLine();  
           
           for (JobPost job : jobs) {
@@ -269,7 +302,6 @@ public class JobPortal extends JFrame{
         jobDescriptionArea.setText("");
         jobCategoryBox.setSelectedIndex(0);
         jobSalarySpinner.setValue(1000);
-        closingDateChooser.setDate(null);
     }
   
     private void displaySelectedJob() {
@@ -283,13 +315,6 @@ public class JobPortal extends JFrame{
             jobDescriptionArea.setText(job.getJobDescription());
             jobCategoryBox.setSelectedItem(job.getJobCategory());
             jobSalarySpinner.setValue((int) job.getJobSalary());
-            try {
-                SimpleDateFormat sdf = new SimpleDateFormat("d/M/yyyy");
-                Date date = sdf.parse(job.getClosingDate());
-                closingDateChooser.setDate(date);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
         }
     }
 
@@ -303,6 +328,67 @@ public class JobPortal extends JFrame{
 
             JOptionPane.showMessageDialog(this, "All fields are required.");
             return;
+        }
+    }
+
+    private void refreshJobListPanel() {
+        jobListContainer.removeAll();
+
+        for (JobPost job : jobs) {
+            JPanel row = new JPanel(new BorderLayout());
+
+            JLabel jobLabel = new JLabel(job.toString());
+            JButton setDateBtn = new JButton("Set Closing Date");
+
+            row.add(jobLabel, BorderLayout.CENTER);
+            row.add(setDateBtn, BorderLayout.EAST);
+
+            // Button action
+            setDateBtn.addActionListener(e -> {
+                showDateDialog(job);
+            });
+
+            jobListContainer.add(row);
+        }
+
+        jobListContainer.revalidate();
+        jobListContainer.repaint();
+    }
+
+    private void showDateDialog(JobPost job) {
+        JDateChooser dateChooser = new JDateChooser();
+        dateChooser.setDateFormatString("d/M/yyyy");
+
+        int option = JOptionPane.showConfirmDialog(
+                this,
+                dateChooser,
+                "Set Closing Date",
+                JOptionPane.OK_CANCEL_OPTION
+        );
+
+        if (option == JOptionPane.OK_OPTION) {
+            Date selectedDate = dateChooser.getDate();
+
+            if (selectedDate == null) {
+                JOptionPane.showMessageDialog(this, "Please select a date.");
+                return;
+            }
+
+            LocalDate today = LocalDate.now();
+            LocalDate closing = selectedDate.toInstant()
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDate();
+
+            if (closing.isBefore(today)) {
+                JOptionPane.showMessageDialog(this, "Cannot set past date.");
+                return;
+            }
+
+            SimpleDateFormat sdf = new SimpleDateFormat("d/M/yyyy");
+            job.setClosingDate(sdf.format(selectedDate));
+
+            saveJobs();
+            refreshJobListPanel();
         }
     }
     // ------------------------------------------------
@@ -319,23 +405,6 @@ public class JobPortal extends JFrame{
             fieldValidation();
 
             double salary = (int) jobSalarySpinner.getValue();
-            Date selectedDate = closingDateChooser.getDate();
-
-            if (selectedDate == null) {
-                JOptionPane.showMessageDialog(this, "Closing date is required.");
-                return;
-            }
-            // prevent past dates
-            LocalDate today = LocalDate.now();
-            LocalDate closing = selectedDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-
-            if (closing.isBefore(today)) {
-                JOptionPane.showMessageDialog(this, "Closing date cannot be in the past.");
-                return;
-            }
-
-            SimpleDateFormat sdf = new SimpleDateFormat("d/M/yyyy");
-            String closingDate = sdf.format(selectedDate);
           
             job.setJobTitle(jobTitleField.getText());
             job.setJobType((String) jobTypeBox.getSelectedItem());
@@ -344,7 +413,6 @@ public class JobPortal extends JFrame{
             job.setJobDescription(jobDescriptionArea.getText());
             job.setJobCategory((String) jobCategoryBox.getSelectedItem());
             job.setJobSalary(salary);
-            job.setClosingDate(closingDate);
 
             if (saveJobs()) {
                 JOptionPane.showMessageDialog(this, "Job updated successfully!");
@@ -356,23 +424,6 @@ public class JobPortal extends JFrame{
         fieldValidation();
 
         double salary = (int) jobSalarySpinner.getValue();
-        Date selectedDate = closingDateChooser.getDate();
-
-        if (selectedDate == null) {
-            JOptionPane.showMessageDialog(this, "Closing date is required.");
-            return;
-        }
-        // prevent past dates
-        LocalDate today = LocalDate.now();
-        LocalDate closing = selectedDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-
-        if (closing.isBefore(today)) {
-            JOptionPane.showMessageDialog(this, "Closing date cannot be in the past.");
-            return;
-        }
-
-        SimpleDateFormat sdf = new SimpleDateFormat("d/M/yyyy");
-        String closingDate = sdf.format(selectedDate);
     
         JobPost newJob = new JobPost(
                 jobTitleField.getText(),
@@ -381,8 +432,7 @@ public class JobPortal extends JFrame{
                 jobLocationField.getText(),
                 jobDescriptionArea.getText(),
                 (String) jobCategoryBox.getSelectedItem(),
-                salary,
-                closingDate
+                salary
         );
 
         jobs.add(newJob);
