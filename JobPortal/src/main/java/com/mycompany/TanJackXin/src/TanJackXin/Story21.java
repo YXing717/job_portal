@@ -1,14 +1,8 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template
- */
 package TanJackXin;
+
 import java.util.ArrayList;
 import java.util.Scanner;
-/**
- *
- * @author jackxin
- */
+
 public class Story21 {
 
     // ===================== Job Class =====================
@@ -16,31 +10,40 @@ public class Story21 {
         String title;
         String company;
         double estimatedSalary;
+        String status;
 
         Job(String title, String company, double estimatedSalary) {
             this.title = title;
             this.company = company;
             this.estimatedSalary = estimatedSalary;
-        }
-
-        @Override
-        public String toString() {
-            return title + " at " + company + " (Est. Salary: RM " + estimatedSalary + ")";
+            this.status = "Applied";
         }
     }
 
-    // ===================== Job Seeker Class =====================
-    static class JobSeeker {
-        String name;
-        ArrayList<Job> appliedJobs = new ArrayList<>();
+    // ===================== VALIDATION =====================
+    static boolean isValidTitle(String input) {
+        return input.matches("^[A-Za-z].*") || input.matches("^\\d+[A-Za-z].*");
+    }
 
-        JobSeeker(String name) {
-            this.name = name;
-        }
+    static boolean isValidCompany(String input) {
+        return input.matches(".*[A-Za-z].*");
+    }
+
+    static boolean isValidSalary(double salary) {
+        return salary >= 1500;
+    }
+
+    // ===================== Job Seeker =====================
+    static class JobSeeker {
+        ArrayList<Job> appliedJobs = new ArrayList<>();
 
         void applyJob(Job job) {
             appliedJobs.add(job);
             System.out.println("\nApplication submitted successfully!");
+        }
+
+        void addDemoJob(Job job) {
+            appliedJobs.add(job);
         }
 
         void viewAppliedJobs() {
@@ -51,24 +54,47 @@ public class Story21 {
                 return;
             }
 
-            System.out.printf("%-5s %-25s %-25s %-15s%n", "No", "Job Title", "Company", "Est. Salary (RM)");
-            System.out.println("------------------------------------------------------------------");
+            System.out.printf("%-5s %-25s %-25s %-15s %-15s%n",
+                    "No", "Job Title", "Company", "Salary (RM)", "Status");
+            System.out.println("-------------------------------------------------------------------------------");
 
             for (int i = 0; i < appliedJobs.size(); i++) {
                 Job job = appliedJobs.get(i);
-                System.out.printf("%-5d %-25s %-25s %-15.2f%n",
+                System.out.printf("%-5d %-25s %-25s %-15.2f %-15s%n",
                         (i + 1),
                         job.title,
                         job.company,
-                        job.estimatedSalary
+                        job.estimatedSalary,
+                        job.status
                 );
             }
 
-            System.out.println("==============================================");
+            System.out.println("=============================================================================");
         }
     }
 
-    // ===================== MAIN METHOD =====================
+    // ===================== SAFE INPUT =====================
+    static int getValidInt(Scanner input) {
+        while (true) {
+            try {
+                return Integer.parseInt(input.nextLine());
+            } catch (Exception e) {
+                System.out.print("Invalid input. Enter a number: ");
+            }
+        }
+    }
+
+    static double getValidDouble(Scanner input) {
+        while (true) {
+            try {
+                return Double.parseDouble(input.nextLine());
+            } catch (Exception e) {
+                System.out.print("Invalid salary format. Enter again: ");
+            }
+        }
+    }
+
+    // ===================== MAIN =====================
     public static void main(String[] args) {
 
         Scanner input = new Scanner(System.in);
@@ -77,47 +103,68 @@ public class Story21 {
         System.out.println("      JOB APPLICATION TRACKING SYSTEM");
         System.out.println("==============================================");
 
-        System.out.print("Enter job seeker name: ");
-        String name = input.nextLine();
+        JobSeeker seeker = new JobSeeker();
 
-        JobSeeker seeker = new JobSeeker(name);
+        // ===== DEMO DATA =====
+        seeker.addDemoJob(new Job("Software Engineer", "Google", 5000));
+        seeker.addDemoJob(new Job("Data Analyst", "Shopee", 4200));
+        seeker.addDemoJob(new Job("System Developer", "Intel", 4800));
 
-        int choice = -1;
-
-        do {
+        while (true) {
             System.out.println("\n----------- MENU -----------");
             System.out.println("1. Apply for Job");
             System.out.println("2. View Applied Jobs");
             System.out.println("3. Exit");
             System.out.print("Choose option: ");
 
-            // Handle invalid input
-            if (!input.hasNextInt()) {
-                System.out.println("Invalid input. Please enter a number.");
-                input.next(); // clear input
-                continue;
-            }
-
-            choice = input.nextInt();
-            input.nextLine(); // consume newline
+            int choice = getValidInt(input);
 
             switch (choice) {
 
                 case 1:
                     System.out.println("\n--- Apply for Job ---");
 
-                    System.out.print("Enter job title: ");
-                    String title = input.nextLine();
+                    // TITLE
+                    String title;
+                    while (true) {
+                        System.out.print("Enter job title: ");
+                        title = input.nextLine();
 
-                    System.out.print("Enter company name: ");
-                    String company = input.nextLine();
+                        if (title.isEmpty()) {
+                            System.out.println("Title cannot be empty.");
+                        } else if (!isValidTitle(title)) {
+                            System.out.println("Invalid title. Must start with a letter or valid format like 3D.");
+                        } else {
+                            break;
+                        }
+                    }
 
-                    System.out.print("Enter estimated salary (RM): ");
-                    double salary = 0;
-                    try {
-                        salary = Double.parseDouble(input.nextLine());
-                    } catch (NumberFormatException e) {
-                        System.out.println("Invalid salary input. Setting salary to 0.");
+                    // COMPANY
+                    String company;
+                    while (true) {
+                        System.out.print("Enter company name: ");
+                        company = input.nextLine();
+
+                        if (company.isEmpty()) {
+                            System.out.println("Company cannot be empty.");
+                        } else if (!isValidCompany(company)) {
+                            System.out.println("Invalid company. Must contain at least one letter.");
+                        } else {
+                            break;
+                        }
+                    }
+
+                    // SALARY
+                    double salary;
+                    while (true) {
+                        System.out.print("Enter estimated salary (RM): ");
+                        salary = getValidDouble(input);
+
+                        if (!isValidSalary(salary)) {
+                            System.out.println("Salary must be at least RM1500.");
+                        } else {
+                            break;
+                        }
                     }
 
                     seeker.applyJob(new Job(title, company, salary));
@@ -129,14 +176,12 @@ public class Story21 {
 
                 case 3:
                     System.out.println("\nExiting system. Goodbye!");
-                    break;
+                    input.close();
+                    return;
 
                 default:
-                    System.out.println("Invalid choice. Try again.");
+                    System.out.println("Invalid choice. Please select 1-3.");
             }
-
-        } while (choice != 3);
-
-        input.close();
+        }
     }
 }
